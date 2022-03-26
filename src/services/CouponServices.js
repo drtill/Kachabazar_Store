@@ -4,6 +4,7 @@ const CouponServices = {
   getAllCoupons() {
     return requests.get('/coupon');
   },
+  
 };
 
 export default CouponServices;
