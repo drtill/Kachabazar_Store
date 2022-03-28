@@ -18,6 +18,9 @@ import ProductCard from '@component/product/ProductCard';
 import MainCarousel from '@component/carousel/MainCarousel';
 import FeatureCategory from '@component/category/FeatureCategory';
 
+const isLiffLogin = true;//process.env.NEXT_PUBLIC_ISLOGIN
+var itemPerPage = 30;
+
 const Detail = ({params,dataPath,title,description, liffEndpoint,liffData,linePOSIdData,
   groupIdData, liffOrderId, liffCompanyId,liffLocationId,countPage,currentPage,
   products,salesOrder, orderDetails,categories,shippingServices,bankNameAndAccounts,
@@ -810,9 +813,9 @@ const CancelPromotionCode = async(promotionCode) =>
             <div className="flex">
               <div className="w-full">
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3 lg:gap-3">
-                  {popularProducts?.slice(0, 18).map((product) => (
+                  {/* {popularProducts?.slice(0, 18).map((product) => (
                     <ProductCard key={product._id} product={product} />
-                  ))}
+                  ))} */}
                 </div>
               </div>
             </div>
@@ -846,9 +849,9 @@ const CancelPromotionCode = async(promotionCode) =>
             <div className="flex">
               <div className="w-full">
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3 lg:gap-3">
-                  {discountProducts?.slice(0, 18).map((product) => (
+                  {/* {discountProducts?.slice(0, 18).map((product) => (
                     <ProductCard key={product._id} product={product} />
-                  ))}
+                  ))} */}
                 </div>
               </div>
             </div>
