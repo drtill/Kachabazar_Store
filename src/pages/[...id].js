@@ -784,7 +784,7 @@ const CancelPromotionCode = async(promotionCode) =>
               <div className="mb-10 flex justify-center">
                 <div className="text-center w-full lg:w-2/5">
                   <h2 className="text-xl lg:text-2xl mb-2 font-serif font-semibold">
-                    Featured Categories
+                    Featured Categories 123456
                   </h2>
                   {params}
                   <p className="text-base font-sans text-gray-600 leading-6">
@@ -838,7 +838,7 @@ const CancelPromotionCode = async(promotionCode) =>
             <div className="mb-10 flex justify-center">
               <div className="text-center w-full lg:w-2/5">
                 <h2 className="text-xl lg:text-2xl mb-2 font-serif font-semibold">
-                  Latest Discounted Products
+                  Latest Discounted Products 111
                 </h2>
                 <p className="text-base font-sans text-gray-600 leading-6">
                   See Our latest discounted products below. Choose your daily
@@ -998,6 +998,10 @@ var companyId = liffCompanyId;
 var locationId = liffLocationId;
 
 var dataPath = 'liffId=' + liffId + '?linePOSId=' + linePOSId + '&groupId=' + groupId + '&orderId=' + liffOrderId + '&companyId=' + liffCompanyId + '&locationId=' + liffLocationId;
+
+var countryData = await ProductServices.getCountry();
+
+console.log(JSON.stringify(countryData));
 
 var liffEndpoint = await  UserServices.getLiffURLTemplate();
 
