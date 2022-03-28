@@ -125,12 +125,371 @@ export const getServerSideProps = async ({req, res,params }) => {
   var dataParam = params.id;
   var coinPOSLiffData = req.url.replace('/','');
 
+  var liffCompanyId = 0;
+  var liffLocationId = 0;
+  var liffProcess = "";
+  var liffCompanyName = "";
+
+  var liffData = '';
+  var linePOSId = '';
+  var lineUserId = '';
+  var groupId = '';
+  var liffOrderId = null;
+
+  var companyName = '';
+  var locationName = '';
+  const promotionId = 0;
+
+  const customerTypeId = 9;
+  var page = 1;
+  var itemPerPage = 30;
+  const query = null;
+  const category = null;
+  const product = null;   
+
+  const title = "all-in-one, heavy-duty & modern ecommerce platform";
+  const description = "CoinPOS Ecommerce Platform - All-in-one, heavy-duty, cost-effective and modern ecommerce platform for business of all sizes.";
+
   
+  if(coinPOSLiffData.length > 0)
+{
+  const parms = coinPOSLiffData.split('?');
+
+  
+
+  if(parms.length > 1)
+  {
+    const liffQuery = parms[0];
+    const liffOrderQuery = parms[1];
+    var liffVar = liffQuery.split("=");
+    if(liffVar[0] === 'liffId')
+    {
+      liffData = liffVar[1];
+      
+    }
+
+    var vars = liffOrderQuery.split("&");
+    for (var i=0;i<vars.length;i++)
+    {
+      var pair = vars[i].split("=");
+      if(pair[0] === 'liffId')
+      {
+        liffData = pair[1];
+        
+      }
+      if(pair[0] === 'linePOSId')
+      {
+        linePOSId = pair[1];
+      }
+      if(pair[0] === 'groupId')
+      {
+        groupId = pair[1];
+      }
+      if(pair[0] === 'orderId')
+      {
+        liffOrderId = Number(pair[1]);
+      }
+      if(pair[0] === 'companyId')
+      {
+          liffCompanyId = Number(pair[1]);
+      }
+      if(pair[0] === 'companyName')
+      {
+          liffCompanyName = pair[1];
+      }
+      if(pair[0] === 'locationId')
+      {
+          liffLocationId = Number(pair[1]);
+      }
+      if(pair[0] === 'process')
+      {
+          liffProcess = pair[1];
+      }
+
+      if(pair[0] === 'liff.state')
+      {
+        var param = pair[1];
+        param = param.replaceAll("%3D","=");
+        param = param.replaceAll("%26","&");
+        param = param.replaceAll("%3F","?");
+        param = param.replace("?","");
+        var m_params = param.split("&");
+        for (var j=0;j<m_params.length;j++)
+        {
+          var paramValue = m_params[j].split("=");
+          if(paramValue[0] === 'linePOSId')
+          {
+            linePOSId = paramValue[1];
+          }
+          if(paramValue[0] === 'groupId')
+          {
+            groupId = paramValue[1];
+          }
+          if(paramValue[0] === 'orderId')
+          {
+            liffOrderId = Number(paramValue[1]);
+          }
+          if(paramValue[0] === 'companyId')
+          {
+            liffCompanyId = Number(paramValue[1]);
+          }
+          if(paramValue[0] === 'locationId')
+          {
+            liffLocationId = Number(paramValue[1]);
+          }
+          if(paramValue[0] === 'process')
+          {
+            liffProcess = paramValue[1];
+          }
+        }
+
+      }
+    }
+  }
+
+}
+
+var liffId = liffData;
+var orderId = liffOrderId;
+var companyId = liffCompanyId;
+var locationId = liffLocationId;
+
+var dataPath = 'liffId=' + liffId + '?linePOSId=' + linePOSId + '&groupId=' + groupId + '&orderId=' + liffOrderId + '&companyId=' + liffCompanyId + '&locationId=' + liffLocationId;
+
+var liffEndpoint = await  UserServices.getLiffURLTemplate();
+
+var catalogName = '';
+var companyCode = '';
+
+const products = await ProductServices.getDefaultDataCompany({
+  //const products = await ProductServices.getCoinPOSProductService({
+    liffId,
+    lineUserId,
+    linePOSId,
+    groupId,
+    orderId,
+    companyId,locationId,
+    companyName,
+    locationName,
+    catalogName,
+    companyCode,
+    promotionId,customerTypeId,page,itemPerPage,query,category,product
+  });
+/*const products = await ProductServices.getCoinPOSProductService({
+  liffId,
+  lineUserId,
+  linePOSId,
+  groupId,
+  orderId,
+  companyId,locationId,
+  companyName,
+  locationName,
+  catalogName:'',
+  promotionId,customerTypeId,page,itemPerPage,query,category,product
+});*/
+
+/*var productVariants = [];//products.productVariantPresenters;
+var productCategories = [];
+
+if(products.productVariantPresenters !== null)
+{
+  for(var i = 0;i < products.productVariantPresenters.length; i++)
+  {
+    var productItem = {};
+    productItem['_id'] = Number(products.productVariantPresenters[i].ProductVariantId);
+    productItem['title'] = products.productVariantPresenters[i].Name;
+    productItem['quantity'] = products.productVariantPresenters[i].StockLevel;
+    productItem['image'] = products.productVariantPresenters[i].ImageUrl;
+    productItem['unit'] = products.productVariantPresenters[i].UPC;
+    productItem['slug'] = products.productVariantPresenters[i].UPC;
+    productItem['originalPrice'] = products.productVariantPresenters[i].Price;
+    productItem['price'] = products.productVariantPresenters[i].Price;
+    productItem['type'] = '';
+    productItem['sku'] = products.productVariantPresenters[i].SKU;
+    productItem['discount'] = 0;
+    productItem['description'] = products.productVariantPresenters[i].Description;
+    productItem['currencySign'] = products.currencySign;
+    
+
+
+    productVariants.push(productItem);
+  }
+}*/
+
+
+/*if(products.productCategoryPresenters !== null)
+{
+  for(var j = 0;j < products.productCategoryPresenters.length; j++)
+  {
+
+    
+    var nests = [];
+    for(var k = 0;k < products.productCategoryPresenters[j].Products.length; k++)
+    {
+      var children = {};
+      children['_id'] = Number(products.productCategoryPresenters[j].Products[k].ProductId);
+      children['title'] = products.productCategoryPresenters[j].Products[k].Name;
+      nests.push(children);
+    }
+    
+
+    
+    var productCategory = {};
+    productCategory['_id'] = Number(products.productCategoryPresenters[j].CategoryId);
+    productCategory['parent'] = products.productCategoryPresenters[j].Name;
+    productCategory['icon'] = products.productCategoryPresenters[j].ImageUrl;
+    productCategory['children'] = nests;
+
+    productCategories.push(productCategory);
+
+
+  }
+}*/
+
+
+/* for(var i = 0;i < products.productCategoryPresenters.length; i++)
+{
+  var productItem = {};
+  productItem['_id'] = Number(products.productVariantPresenters[i].ProductVariantId);
+  productItem['title'] = products.productVariantPresenters[i].Name;
+  productItem['quantity'] = products.productVariantPresenters[i].StockLevel;
+  productItem['image'] = products.productVariantPresenters[i].ImageUrl;
+  productItem['unit'] = products.productVariantPresenters[i].UPC;
+  productItem['slug'] = products.productVariantPresenters[i].UPC;
+  productItem['originalPrice'] = products.productVariantPresenters[i].Price;
+  productItem['price'] = products.productVariantPresenters[i].Price;
+  productItem['type'] = '';
+  productItem['sku'] = products.productVariantPresenters[i].SKU;
+  productItem['discount'] = 0;
+  productItem['description'] = products.productVariantPresenters[i].Description;
+  productItem['currencySign'] = products.currencySign;
+  
+
+
+  productVariants.push(productItem);
+} */
+
+/*var orderData = {};
+var orderDetailDatas = [];
+ if(products.orderDetails !== null)
+{
+  for(var i = 0;i < products.orderDetails.length; i++)
+  {
+    var orderDetailItem = {};
+    orderDetailItem['_id'] = products.orderDetails[i].orderDetailId;
+    orderDetailItem['upc'] = products.orderDetails[i].upc;
+    orderDetailItem['orderId'] = products.orderDetails[i].orderId;
+    orderDetailItem['productVariantId'] = products.orderDetails[i].productVariantId;
+    orderDetailItem['productVariantName'] = products.orderDetails[i].productVariantName;
+    orderDetailItem['sku'] = products.orderDetails[i].sku;
+    orderDetailItem['productVariantPrice'] = products.orderDetails[i].productVariantPrice;
+    orderDetailItem['locationId'] = products.orderDetails[i].locationId;
+    orderDetailItem['discount'] = products.orderDetails[i].discount;
+    orderDetailItem['quantity'] = products.orderDetails[i].quantity;
+    orderDetailItem['imageUrl'] = products.orderDetails[i].imageUrl;
+    orderDetailItem['lineOrder'] = products.orderDetails[i].lineOrder;
+
+    orderDetailDatas.push(orderDetailItem);
+
+  }
+}*/
+
+var promotions = [];
+promotions = products.promotions;
+var shippingServices = products.shippingServices;
+var bankNameAndAccounts = products.bankNameAndAccounts;
+var countPage = products.countPage;
+var currentPage = products.currentPage;
+var currencySign = products.currencySign;
+var customerFirstName = products.firstName;
+var customerLastName = products.lastName;
+var customerEmail = products.email;
+var customerPhoneNumber = products.mobile;
+
+var address1 = products.address1;
+var countryId = products.countryId;
+var provinceId = products.provinceId;
+var cityId = products.cityId;
+var districtId = products.districtId;
+var postalcode = products.postalcode;
+var countrys = products.countrys;
+var provinces = products.provinces;
+var cities = products.cities;
+var districts = products.districts;
+
+var companyLogo = products.companyLogoUrl;
+
+var locationAddress1 = products.locationAddress1;
+var locationAddress2 = products.locationAddress2;
+var locationCity = products.locationCity;
+var locationStateOrProvince = products.locationStateOrProvince;
+var locationCountry = products.locationCountry;
+var locationPostalCode = products.locationPostalCode;
+var locationEmail = products.locationEmail;
+var locationTel = products.locationTel;
+
+var companyFacebook = products.companyFacebook;
+var companyLine = products.companyLine;
+
+
+companyName = products.companyName;
+locationName = products.locationName;
+
 
   return {
     props: { 
       params: dataParam,
-      
+      dataPath:dataPath,
+      title:title,
+      description:description,
+      liffEndpoint:liffEndpoint,
+      liffData:liffData,
+      linePOSIdData:linePOSId,
+      groupIdData:groupId,
+      liffOrderId:liffOrderId,
+      liffCompanyId:liffCompanyId,
+      liffLocationId:liffLocationId,
+      countPage:countPage,
+      currentPage:currentPage,
+      //products: productVariants,
+      //salesOrder:orderData,
+      //orderDetails:orderDetailDatas,
+      shippingServices:shippingServices,
+      bankNameAndAccounts:bankNameAndAccounts,
+      currencySign:currencySign,
+      companyName:companyName,
+      companyLogo:companyLogo,
+      companyFacebook:companyFacebook,
+      companyLine:companyLine,
+
+      locationName:locationName,
+      //categories:productCategories,
+      customerFirstName:customerFirstName,
+      customerLastName:customerLastName,
+      customerEmail:customerEmail,
+      customerPhoneNumber:customerPhoneNumber,
+
+      address1:address1,
+      countryId:countryId,
+      provinceId:provinceId,
+      cityId:cityId,
+      districtId:districtId,
+      postalcode:postalcode,
+      countrys:countrys,
+      provinces:provinces,
+      cities:cities,
+      districts:districts,
+
+      promotions:promotions,
+
+      locationAddress1:locationAddress1,
+      locationAddress2:locationAddress2,
+      locationCity:locationCity,
+      locationStateOrProvince:locationStateOrProvince,
+      locationCountry:locationCountry,
+      locationPostalCode:locationPostalCode,
+      locationEmail:locationEmail,
+      locationTel:locationTel
 
     },
   };
