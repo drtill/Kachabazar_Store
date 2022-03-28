@@ -429,6 +429,324 @@ const Detail = ({params,dataPath,title,description, liffEndpoint,liffData,linePO
     
 
 }
+
+const CancelPromotionCode = async(promotionCode) =>
+{
+  setPromotionLoading(true);
+  var orderId = liffOrderId;
+      var companyId = liffCompanyId;
+      var locationId = liffLocationId;
+      var qrPromotion = promotionCode;
+      var pictureUrl = '';
+      var orderDetails = []
+
+      for(var i = 0; i<items.length;i++)
+      {
+        var itemData = items[i];
+        var orderDetail = {
+          VariantId:itemData.id,
+          Quantity:itemData.quantity,
+          ProductVariantLabel:itemData.title,
+          UnitPrice:itemData.price
+        };
+         
+        orderDetails.push(orderDetail);
+      }
+      const promotion = await ProductServices.cancelPromotionCode({
+        companyId,
+        locationId,
+        orderId,
+        qrPromotion,
+        lineUserId,
+        linePOSId,
+        liffId,
+        pictureUrl,
+        catalogName:'',
+        orderDetails:JSON.stringify(orderDetails)
+      });
+      var salesOrderDetails = promotion.orderDetails;
+
+          const productDs = [];
+          const discountDetails = [];
+          
+          for(var i = 0;i<salesOrderDetails.length;i++)
+          {
+            var detail = {
+              id: Number(salesOrderDetails[i].productVariantId),
+              slug:salesOrderDetails[i].productId,
+              name: salesOrderDetails[i].upc,
+              title:salesOrderDetails[i].productVariantName,
+              sku: salesOrderDetails[i].sku,
+              quantity:salesOrderDetails[i].quantity,
+              price: salesOrderDetails[i].productVariantPrice,
+              image:salesOrderDetails[i].imageUrl,
+            }
+            var discountDetail = {
+              id: Number(salesOrderDetails[i].productVariantId),
+              discount:Number(salesOrderDetails[i].discount),
+              discountRate:Number(salesOrderDetails[i].discountRate)
+            }
+            productDs.push(detail);
+            discountDetails.push(discountDetail);
+          }
+      //alert("Apply Promotion2 = " + promotionCode + " " + lineUserId);
+      
+      setItems(productDs);
+          sessionStorage.removeItem('discountDetails')
+          sessionStorage.removeItem('discountRate');
+          sessionStorage.removeItem('promotionCode');
+          sessionStorage.removeItem('promotionMinimumAmount');
+          sessionStorage.removeItem('promotionProductIdList');
+          sessionStorage.removeItem('isForAllProduct');
+
+          setPromotionCode(undefined);
+
+          localStorage.removeItem('discountDetails');
+          localStorage.removeItem('discountRate');
+          localStorage.removeItem('promotionCode');
+          localStorage.removeItem('promotionMinimumAmount');
+          localStorage.removeItem('promotionProductIdList');
+          localStorage.removeItem('isForAllProduct');
+
+          setDiscountDetail(undefined)
+
+          setPromotionLoading(false);
+}
+    const ApplyPromotionCode = async(promotionCode,discountPercentage, isForAllProduct, minimumAmount, productIdList) =>
+    {
+      //return;
+      setPromotionLoading(true);
+      var orderId = liffOrderId;
+      var companyId = liffCompanyId;
+      var locationId = liffLocationId;
+      var qrPromotion = promotionCode;
+      var pictureUrl = '';
+      var orderDetails = []
+
+      for(var i = 0; i<items.length;i++)
+      {
+        var itemData = items[i];
+        var orderDetail = {
+          VariantId:itemData.id,
+          Quantity:itemData.quantity,
+          ProductVariantLabel:itemData.title,
+          UnitPrice:itemData.price
+        };
+         
+        orderDetails.push(orderDetail);
+      }
+      const promotion = await ProductServices.applyPromotionCode({
+        companyId,
+        locationId,
+        orderId,
+        qrPromotion,
+        lineUserId,
+        linePOSId,
+        liffId,
+        pictureUrl,
+        catalogName:'',
+        orderDetails:JSON.stringify(orderDetails)
+      });
+      var salesOrderDetails = promotion.orderDetails;
+
+          const productDs = [];
+          const discountDetails = [];
+          
+          for(var i = 0;i<salesOrderDetails.length;i++)
+          {
+            var detail = {
+              id: Number(salesOrderDetails[i].productVariantId),
+              slug:salesOrderDetails[i].productId,
+              name: salesOrderDetails[i].upc,
+              title:salesOrderDetails[i].productVariantName,
+              sku: salesOrderDetails[i].sku,
+              quantity:salesOrderDetails[i].quantity,
+              price: salesOrderDetails[i].productVariantPrice,
+              image:salesOrderDetails[i].imageUrl,
+            }
+            var discountDetail = {
+              id: Number(salesOrderDetails[i].productVariantId),
+              discount:Number(salesOrderDetails[i].discount),
+              discountRate:Number(salesOrderDetails[i].discountRate)
+            }
+            productDs.push(detail);
+            discountDetails.push(discountDetail);
+          }
+      //alert("Apply Promotion2 = " + promotionCode + " " + lineUserId);
+      //alert(productIdList);
+      setItems(productDs);
+          sessionStorage.setItem('discountDetails', JSON.stringify(discountDetails));
+          sessionStorage.setItem('discountRate', (discountPercentage/100));
+          sessionStorage.setItem('promotionCode', promotionCode);
+          sessionStorage.setItem('promotionMinimumAmount', minimumAmount);
+          sessionStorage.setItem('promotionProductIdList', JSON.stringify(productIdList));
+          sessionStorage.setItem('isForAllProduct', isForAllProduct);
+
+          setPromotionCode(promotionCode);
+
+          localStorage.setItem('discountDetails',JSON.stringify(discountDetails));
+          localStorage.setItem('discountRate', (discountPercentage/100));
+          localStorage.setItem('promotionCode', promotionCode);
+          localStorage.setItem('promotionMinimumAmount', minimumAmount);
+          localStorage.setItem('promotionProductIdList', JSON.stringify(productIdList));
+          localStorage.setItem('isForAllProduct', isForAllProduct);
+
+          setDiscountDetail(JSON.stringify(discountDetails))
+          setPromotionLoading(false);
+    }
+    const SearchProduct = async (searchText) => 
+    {
+      //alert("Searching = " + searchText);
+      RefreshProductList(liffData,lineUserId,linePOSId,groupId,liffOrderId,liffCompanyId,liffLocationId,'','',0,9,1,30,searchText)
+    }
+    const FilterCategory = async (categoty) => 
+    {
+      //alert("categoty = " + categoty);
+      RefreshProductList(liffData,lineUserId,linePOSId,groupId,liffOrderId,liffCompanyId,liffLocationId,'','',0,9,1,30,'',categoty)
+    }
+    const FilterProduct = async (category,product) => 
+    {
+      //alert("product = " + product);
+      RefreshProductList(liffData,lineUserId,linePOSId,groupId,liffOrderId,liffCompanyId,liffLocationId,'','',0,9,1,30,'',category,product)
+    }
+    const RefreshProductList = async (liffId, lineUserId, linePOSId, groupId, orderId,companyId,locationId,companyName, locationName, promotionId,customerTypeId,page,itemPerPage,query,category,product) =>
+    {
+      setLoading(true);
+      //alert("Refresh");
+      query = query === undefined ? 'null' : query;
+      category = category === undefined ? 'null' : category;
+      product = product === undefined ? 'null' : product;
+      const products = await ProductServices.getCoinPOSProductService({
+        liffId,
+        lineUserId,
+        linePOSId,
+        groupId,
+        orderId,
+        companyId,
+        companyCode:"",
+        locationId,
+        companyName,
+        locationName,
+        catalogName:"",
+        promotionId,customerTypeId,page,itemPerPage,query,category,product
+      });
+
+      currentPage = products.currentPage;
+      var productVariants = [];//products.productVariantPresenters;
+      for(var i = 0;i < products.productVariantPresenters.length; i++)
+      {
+        var productItem = {};
+        productItem['_id'] = Number(products.productVariantPresenters[i].ProductVariantId);
+        productItem['title'] = products.productVariantPresenters[i].Name;
+        productItem['quantity'] = products.productVariantPresenters[i].StockLevelDisplay;
+        productItem['image'] = products.productVariantPresenters[i].ImageUrl;
+        productItem['unit'] = products.productVariantPresenters[i].UPC;
+        productItem['slug'] = products.productVariantPresenters[i].UPC;
+        productItem['tag'] = products.productVariantPresenters[i].ProductId;
+        productItem['originalPrice'] = products.productVariantPresenters[i].PriceDisplay;
+        productItem['price'] = products.productVariantPresenters[i].PriceDisplay;
+        productItem['type'] = '';
+        productItem['sku'] = products.productVariantPresenters[i].SKU;
+        productItem['discount'] = 0;
+        productItem['description'] = products.productVariantPresenters[i].Description;
+        productItem['currencySign'] = products.currencySign;
+
+
+        productVariants.push(productItem);
+      }
+
+      pagingManager();
+      setProductList(productVariants);
+
+
+      setLoading(false);
+    }
+
+    const pagingManager = () =>
+    {
+      var allPage = countPage;
+      var startPage = 1;
+      var endPage = allPage;
+      if(currentPage < 3)
+      {
+        startPage = 1;
+      }
+      else
+      {
+        startPage = currentPage - 2;
+      }
+      if(currentPage + 2 > allPage)
+      {
+        endPage = allPage;
+      }
+      else
+      {
+        if(currentPage < 3)
+        {
+          endPage = 5;
+        }
+        else
+        {
+          endPage = currentPage + 2;
+        }
+            
+      }
+
+      var indents = [];
+    
+        if(startPage > 1)
+        {
+          indents.push(<button onClick={()=>RefreshProductList(liffData,lineUserId,linePOSId,groupId,liffOrderId,liffCompanyId,liffLocationId,'','',0,9,startPage-1,30)} className="hover:text-red-600 text-red-400 text-lg cursor-pointer px-2">
+              Previous
+            </button>);
+        }
+        else
+        {
+          indents.push(
+            <button className="text-gray-400 text-lg px-2" disabled>Previous</button>
+          );
+        }
+
+        var iPage = 0;
+        for (let i = startPage; i <= endPage; i++) {
+          if(i === currentPage)
+          {
+            indents.push(<button className="text-gray-400 text-lg px-2" disabled>{i}</button>);
+          }
+          else
+          {
+            iPage = i;
+            indents.push(<button onClick={()=>RefreshProductList(liffData,lineUserId,linePOSId,groupId,liffOrderId,liffCompanyId,liffLocationId,'','',0,9,i,30)} className="hover:text-red-600 text-red-400 text-lg cursor-pointer px-2">
+            {i}
+          </button>);
+          }
+          
+        }
+
+        if(endPage > allPage)
+        {
+          indents.push(<button className="text-gray-400 text-lg px-2" disabled>Next</button>);
+          
+        }
+        else
+        {
+          if(endPage === allPage)
+          {
+            indents.push(<button className="text-gray-400 text-lg px-2" disabled>Next</button>);
+          }
+          else
+          {
+            indents.push(<button onClick={()=>RefreshProductList(liffData,lineUserId,linePOSId,groupId,liffOrderId,liffCompanyId,liffLocationId,'','',0,9,endPage+1,30)} className="hover:text-red-600 text-red-400 text-lg cursor-pointer px-2">
+            Next
+          </button>)
+          }
+          
+        }
+
+        setPaging(indents);
+    }
+    
+
   return (
     <>
       <Layout>
