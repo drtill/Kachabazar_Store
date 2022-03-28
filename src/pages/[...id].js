@@ -25,6 +25,50 @@ const Detail = ({params,dataPath,title,description, liffEndpoint,liffData,linePO
   }) => {
   const [value, set] = useSessionstorage('products', products);
 
+  const router = useRouter();
+
+    const [liffId, setLiffId] = useState(liffData);
+    const [linePOSId, setLinePOSId] = useState(linePOSIdData);
+    const [groupId, setGroupId] = useState(groupIdData);
+    const [companyId, setCompanyId] = useState(liffCompanyId);
+    const [locationId, setLocationId] = useState(liffLocationId);
+    const [orderId, setOrderId] = useState(liffOrderId);
+
+    const [loading, setLoading] = useState(true);
+
+    const [categoryLoading, setCategoryLoading] = useState(true);
+    const [newProductLoading, setNewProductLoading] = useState(true);
+
+    const [promotionLoading, setPromotionLoading] = useState(false);
+
+    //this.setState({liffId:liffData});
+    const [productList, setProductList] = useState([]);
+    const [newProductList, setNewProductList] = useState([]);
+    const [categoryList, setCategoryList] = useState([]);
+    const [lineProfileImage, setProfileImage] = useState('');
+    const [lineUserId, setLineUserId] = useState('');
+    const [lineUsername, setLineUsername] = useState('');
+    const [pagingIndent, setPaging] = useState([]);
+    const [companyNameData, setCompanyName] = useState(companyName);
+
+    const [companyFacebookData, setCompanyFacebook] = useState(companyFacebook);
+    const [companyLineData, setCompanyLine] = useState(companyLine);
+
+    const [locationNameData, setLocationName] = useState(locationName);
+    const [locationAddress1Data, setLocationAddress1] = useState(locationAddress1);
+    const [locationAddress2Data, setLocationAddress2] = useState(locationAddress2);
+    const [locationCityData, setLocationCity] = useState(locationCity);
+    const [locationStateOrProvinceData, setLocationStateOrProvince] = useState(locationStateOrProvince);
+    const [locationCountryData, setLocationCountry] = useState(locationCountry);
+    const [locationPostalCodeData, setLocationPostalCode] = useState(locationPostalCode);
+    const [locationEmailData, setLocationEmail] = useState(locationEmail);
+    const [locationTelData, setLocationTel] = useState(locationTel);
+
+    const [discountDataDetails,setDiscountDetail] = useState('');
+    const [promotionCode,setPromotionCode] = useState('');
+
+    const { setItems,clearCartMetadata,emptyCart, addItem, items } = useCart();
+
   return (
     <>
       <Layout>
