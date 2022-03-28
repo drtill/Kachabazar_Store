@@ -11,7 +11,18 @@ import ProductCard from '@component/product/ProductCard';
 import MainCarousel from '@component/carousel/MainCarousel';
 import FeatureCategory from '@component/category/FeatureCategory';
 
-const Detail = ({ params,products, popularProducts, discountProducts }) => {
+const Detail = ({params,dataPath,title,description, liffEndpoint,liffData,linePOSIdData,
+  groupIdData, liffOrderId, liffCompanyId,liffLocationId,countPage,currentPage,
+  products,salesOrder, orderDetails,categories,shippingServices,bankNameAndAccounts,
+  currencySign, companyName, locationName,companyLogo,
+  customerFirstName,customerLastName,customerEmail, customerPhoneNumber,
+  address1,countryId,provinceId,cityId,districtId,postalcode,
+  countrys,provinces,cities,districts,
+  promotions,
+  locationAddress1,locationAddress2,locationCity,locationStateOrProvince,locationCountry,locationPostalCode,
+  locationEmail,locationTel,
+  companyFacebook,companyLine
+  }) => {
   const [value, set] = useSessionstorage('products', products);
 
   return (
