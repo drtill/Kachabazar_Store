@@ -15,11 +15,40 @@ import { useEffect } from 'react';
 const Home = ({ params,countryJson,products, popularProducts, discountProducts }) => {
   const [value, set] = useSessionstorage('products', products);
 
-  useEffect(() => 
+  useEffect(async () => 
   {
+    try
+  {
+    var countryData = ''
+    await fetch('https://coinpos-uat.azurewebsites.net/lineliff/' + 'GetCountry',
+    { 
+      method:'POST',
+      //credentials:"include",
+      headers: {'Content-Type': 'application/json','x-security-lock':'0241CCFF2D40AF7AF8A4FC02272C47A30D15DBDFB36E3266D1296212574F328E'},
+      body:``  
+      }).then(function(response) {
+        return response.text();
+      }).then(function(data) {
+
+      //var obj = JSON.parse(data);
+      //console.log("get country " + data);
+      countryData = (data);
+    });
+    
+      alert(countryData);
+  }
+  catch (err) 
+  {
+    alert("Error " + err.message);
+    //res.status(200).send({
+    //  message: err.message,
+    //});
+  }
       alert("Get Province");
-    const provinces = await ProductServices.getStateProvince();
-    alert("Get Data = " + JSON.stringify(provinces));
+      const products = await ProductServices.getShowingProducts();
+      alert("Product = " + JSON.stringify(products));
+    //const provinces = await ProductServices.getStateProvince();
+    //alert("Get Data = " + JSON.stringify(provinces));
 
   },[]);
   return (
