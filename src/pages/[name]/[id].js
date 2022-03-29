@@ -10,10 +10,18 @@ import ProductServices from '@services/ProductServices';
 import ProductCard from '@component/product/ProductCard';
 import MainCarousel from '@component/carousel/MainCarousel';
 import FeatureCategory from '@component/category/FeatureCategory';
+import { useEffect } from 'react';
 
 const Home = ({ params,countryJson,products, popularProducts, discountProducts }) => {
   const [value, set] = useSessionstorage('products', products);
 
+  useEffect(() => 
+  {
+      alert("Get Province");
+    const provinces = await ProductServices.getStateProvince();
+    alert("Get Data = " + JSON.stringify(provinces));
+
+  },[]);
   return (
     <>
       <Layout>
