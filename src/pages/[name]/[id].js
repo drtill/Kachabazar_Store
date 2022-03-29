@@ -11,7 +11,7 @@ import ProductCard from '@component/product/ProductCard';
 import MainCarousel from '@component/carousel/MainCarousel';
 import FeatureCategory from '@component/category/FeatureCategory';
 
-const Home = ({ params,products, popularProducts, discountProducts }) => {
+const Home = ({ params,countryJson,products, popularProducts, discountProducts }) => {
   const [value, set] = useSessionstorage('products', products);
 
   return (
@@ -46,7 +46,9 @@ const Home = ({ params,products, popularProducts, discountProducts }) => {
                   {"Catalog = " + params}
                   <p className="text-base font-sans text-gray-600 leading-6">
                     Choose your necessary products from this feature categories.
+
                   </p>
+                  {countryJson}
                 </div>
               </div>
               <FeatureCategory />
@@ -125,12 +127,17 @@ export const getServerSideProps = async ({req, res,params }) => {
   var coinPOSLiffData = req.url.replace('/','');
   const products = await ProductServices.getShowingProducts();
 
+  const countrys = await ProductServices.getCountry();
+
+  var countryJson = JSON.stringify(countrys);
+
   const popularProducts = products.filter((p) => p.discount === 0);
   const discountProducts = products.filter((p) => p.discount >= 5);
 
   return {
     props: {
         params: dataParam,
+        countryJson:countryJson,
       products: products,
       popularProducts: popularProducts.slice(0, 50),
       discountProducts: discountProducts,
