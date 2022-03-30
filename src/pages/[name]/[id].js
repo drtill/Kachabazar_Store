@@ -261,7 +261,6 @@ const Home = ({params,companyCode,dataPath,title,description,countPage,currentPa
       {
         alert(err.message);
       }
-  const countrys = await ProductServices.fetchGetCountry('');
   //alert(countrys);
   
 

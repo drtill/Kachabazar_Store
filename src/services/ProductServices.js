@@ -1,7 +1,4 @@
 import requests from './httpServices';
-import constants from '@utils/constant';
-
-const coinposServiceUrl = 'https://coinpos-uat.azurewebsites.net/LineLiff/';
 
 const ProductServices = {
   getShowingProducts() {
@@ -9,6 +6,9 @@ const ProductServices = {
   },
   applyPromotionCode(body) {
     return requests.post('/products/ApplyPromotionCode',body);
+  },
+  cancelPromotionCode(body) {
+    return requests.post('/products/CancelPromotionCode',body);
   },
 
   getDiscountedProducts() {
@@ -23,33 +23,6 @@ const ProductServices = {
   },
   getCoinPOSProductService(body){
     return requests.post('/products/show1',body);
-  },
-  async fetchGetCoinPOSProductService(body){
-    var productList = '';
-    await fetch(coinposServiceUrl + 'GetLiffProductList',//fetch('http://localhost:5002/simple-cors3', 
-      { 
-        method:'POST',
-        //credentials:"include",
-        headers: {'Content-Type': 'application/json','x-security-lock':'0241CCFF2D40AF7AF8A4FC02272C47A30D15DBDFB36E3266D1296212574F328E'},
-        body:`{"LiffId": "${body.liffId}","LineUserId":"${body.lineUserId}", "LinePOSId":"${body.linePOSId}", "GroupId":"${body.groupId}","OrderId":${body.orderId},"CompanyId":${body.companyId},
-        "CatalogName":"${body.catalogName}","CompanyCode":"${body.companyCode}","PromotionId":${body.promotionId},"LocationId":${body.locationId},"CompanyName":"${body.companyName}","LocationName":"${body.locationName}","Page":${body.page},"RowPerPage":${body.itemPerPage},"Query":"${body.query}","Category":"${body.category}","Product":"${body.product}"}`
-        
-      }).then(function(response) {
-        return response.text();
-      }).then(function(data) {
-
-        alert("GetData = " + data);
-        console.log("GetData = " + data)
-        var obj = JSON.parse(data);
-        var pvJson = obj.ProductVariantListJson
-        productList = JSON.parse(pvJson)
-        
-        //closeNav(null);
-      });
-
-      return productList;
-
-
   },
   getDefaultDataCompany(body){
     return requests.post('/products/GetDefaultDataCompany',body);
@@ -82,69 +55,9 @@ const ProductServices = {
   {
     return requests.post('/products/GetCountry',body);
   },
-  async fetchGetCountry(body)
-  {
-    try
-    {
-      var countryData = ''
-      //alert("Url = " + coinposServiceUrl + 'GetCountry')
-      await fetch(coinposServiceUrl + 'GetCountry',
-      { 
-        method:'POST',
-        headers: {'Content-Type': 'application/json','x-security-lock':'0241CCFF2D40AF7AF8A4FC02272C47A30D15DBDFB36E3266D1296212574F328E'},
-        body:``  
-        }).then(function(response) {
-          return response.text();
-        }).then(function(data) {
-
-        countryData = (data);
-      });
-      //alert("coinpos = " + countryData);
-      return countryData;
-        //alert("coinpos = " + countryData);
-    }
-    catch (err) 
-    {
-      //alert("Error " + err.message);
-      return "Error " + err.message;
-    }
-  },
   getStateProvince(body)
   {
     return requests.post('/products/GetStateProvince',body);
-  },
-  async fetchGetStateProvince(body)
-  {
-    try
-    {
-      var provinceData = ''
-      await fetch(serviceUrl + '/products/GetStateProvince',
-      { 
-        method:'POST',
-        //credentials:"include",
-        headers: {'Content-Type': 'application/json','x-security-lock':'0241CCFF2D40AF7AF8A4FC02272C47A30D15DBDFB36E3266D1296212574F328E'},
-        body:body  
-        }).then(function(response) {
-          return response.text();
-        }).then(function(data) {
-
-        //var obj = JSON.parse(data);
-        //console.log("get country " + data);
-        provinceData = (data);
-      });
-      
-        return provinceData;
-    }
-    catch (err) 
-    {
-      //alert("Error " + err.message);
-
-      return "Error " + err.message;
-      //res.status(200).send({
-      //  message: err.message,
-      //});
-    }
-    //return requests.post('/products/GetCountry',body);
   },
   getDistrict(body)
   {
