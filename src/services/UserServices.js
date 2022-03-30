@@ -1,4 +1,7 @@
 import requests from './httpServices';
+import constants from '@utils/constant';
+
+const coinposServiceUrl = 'https://coinpos-uat.azurewebsites.net/LineLiff/';
 
 const UserServices = {
   userLogin(body) {
@@ -23,6 +26,33 @@ const UserServices = {
   },
   coinposCheckExpired(body) {
     return requests.post(`/user/coinpos-check-expired`, body);
+  },
+
+  async fetchCoinposCheckExpired(body) {
+    try
+    {
+      var expiredData = ''
+      await fetch(coinposServiceUrl + 'CheckCoinposUserExpired',//fetch('http://localhost:5002/simple-cors3', 
+      { 
+        method:'POST',
+        //credentials:"include",
+        headers: {'Content-Type': 'application/json','x-security-lock':'0241CCFF2D40AF7AF8A4FC02272C47A30D15DBDFB36E3266D1296212574F328E'},
+        body:`{"CompanyId":${body.companyId},"Email":"${body.email}"}`
+        }).then(function(response) {
+          return response.text();
+        }).then(function(data) {
+
+          expiredData = (data);
+      });
+      
+      return expiredData;
+        //alert("coinpos = " + countryData);
+    }
+    catch (err) 
+    {
+      //alert("Error " + err.message);
+      return "Error " + err.message;
+    }
   },
 
   signUpWithProvider(body) {
