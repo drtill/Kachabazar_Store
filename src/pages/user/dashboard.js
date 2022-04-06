@@ -2,7 +2,7 @@ import Cookies from 'js-cookie';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { IoLockOpenOutline } from 'react-icons/io5';
 import { FiCheck, FiRefreshCw, FiShoppingCart, FiTruck } from 'react-icons/fi';
 
@@ -14,35 +14,266 @@ import { userSidebar } from '@utils/data';
 import Card from '@component/order-card/Card';
 import { UserContext } from '@context/UserContext';
 import OrderServices from '@services/OrderServices';
+import UserServices from '@services/UserServices';
+import ProductServices from '@services/ProductServices';
 import RecentOrder from '@pages/user/recent-order';
 
-const Dashboard = ({ title, description, children }) => {
+const Dashboard = ({ title, description, children, companyLogo }) => {
   const router = useRouter();
   const {
     dispatch,
     state: { userInfo },
   } = useContext(UserContext);
 
-  const { data } = useAsync(OrderServices.getOrderByUser);
-  const { pending, processing, delivered } = useFilter(data);
+  var companyLogo = '';
+  var companyName = '';
+  var locationName = '';
+  var locationAddress1 = '';
+  var locationAddress2 = '';
+  var locationCity = '';
+  var locationStateOrProvince = '';
+  var locationCountry = '';
+  var locationPostalCode = '';
+  var locationEmail = '';
+  var locationTel = '';
 
+  var customerId = 0;
+
+  const [companyId, setCompanyId] = useState(0);
+  const [locationId, setLocationId] = useState(0);
+  const [linePOSId, setLinePOSId] = useState('');
+  const [lineUserId, setLineUserId] = useState('');
+  const [groupId, setGroupId] = useState('');
+  const [liffId, setLiffId] = useState('');
+  const [pictureUrl, setPictureUrl] = useState('');
+
+  
+  
+  var catalogName = '';
+  var customerEmail = '';
+  var dataPath = '';
+  if(sessionStorage.getItem('dataPath'))
+  {
+    dataPath = sessionStorage.getItem('dataPath'); 
+      
+  }
+
+  if(sessionStorage.getItem('customerEmail'))
+  {
+    customerEmail = sessionStorage.getItem('customerEmail'); 
+      
+  }
+
+  if(sessionStorage.getItem('catalogName'))
+  {
+    catalogName = sessionStorage.getItem('catalogName'); 
+    
+          
+  }
+  if(sessionStorage.getItem('companyLogo'))
+  {
+    companyLogo = sessionStorage.getItem('companyLogo'); 
+    
+  }
+  if(sessionStorage.getItem('companyName'))
+  {
+    
+    companyName = sessionStorage.getItem('companyName'); 
+    //alert(companyName);
+  }
+  if(sessionStorage.getItem('locationName'))
+  {
+    locationName = sessionStorage.getItem('locationName'); 
+    
+  }
+  if(sessionStorage.getItem('locationAddress1'))
+  {
+    locationAddress1 = sessionStorage.getItem('locationAddress1'); 
+    
+  }
+  if(sessionStorage.getItem('locationAddress2'))
+  {
+    locationAddress2 = sessionStorage.getItem('locationAddress2'); 
+    
+  }
+  if(sessionStorage.getItem('locationCity'))
+  {
+    locationCity = sessionStorage.getItem('locationCity'); 
+    
+  }
+  if(sessionStorage.getItem('locationStateOrProvince'))
+  {
+    locationStateOrProvince = sessionStorage.getItem('locationStateOrProvince'); 
+    
+  }
+  if(sessionStorage.getItem('locationCountry'))
+  {
+    locationCountry = sessionStorage.getItem('locationCountry'); 
+    
+  }
+  if(sessionStorage.getItem('locationPostalCode'))
+  {
+    locationPostalCode = sessionStorage.getItem('locationPostalCode'); 
+    
+  }
+  if(sessionStorage.getItem('locationEmail'))
+  {
+    locationEmail = sessionStorage.getItem('locationEmail'); 
+    
+  }
+  if(sessionStorage.getItem('locationTel'))
+  {
+    locationTel = sessionStorage.getItem('locationTel'); 
+    
+  }
+      if(sessionStorage.getItem('liffId'))
+      {
+        
+        liffId = sessionStorage.getItem('liffId'); 
+        //alert("Liff id = " + liffId)
+      }
+      if(sessionStorage.getItem('linePOSId'))
+      {
+        linePOSId = sessionStorage.getItem('linePOSId'); 
+        //alert("LinePOS id = " + linePOSId)
+      }
+      if(sessionStorage.getItem('lineUserId'))
+      {
+        lineUserId = sessionStorage.getItem('lineUserId'); 
+        
+      }
+      if(sessionStorage.getItem('companyId'))
+      {
+        companyId = sessionStorage.getItem('companyId'); 
+        
+      }
+      if(sessionStorage.getItem('locationId'))
+      {
+        locationId = sessionStorage.getItem('locationId'); 
+        
+      }
+      if(sessionStorage.getItem('groupId'))
+      {
+        groupId = sessionStorage.getItem('groupId'); 
+        
+      }
+
+      if(sessionStorage.getItem('customerId'))
+      {
+        customerId = sessionStorage.getItem('customerId'); 
+        //alert('customerId = ' + customerId);
+              
+      }
+
+  const { data } = useAsync(() => ProductServices.getDashboardOrderByUserId(
+    {
+      companyId,
+      liffId,
+      lineUserId,
+      linePOSId,
+      catalogName:catalogName,
+      email:customerEmail
+    }));
+  //useAsync(OrderServices.getOrderByUser);
+  const { allOrderCount, pendingOrderCount, processingOrderCount, deliveredOrderCount } = useFilter(data);
+
+
+
+
+
+  
   const handleLogOut = () => {
     dispatch({ type: 'USER_LOGOUT' });
     Cookies.remove('userInfo');
     Cookies.remove('couponInfo');
-    router.push('/');
+    localStorage.removeItem('userInfo');
+    router.push('/' + dataPath);
   };
 
-  useEffect(() => {
-    if (!userInfo) {
-      router.push('/');
+  useEffect(async() => {
+    //alert('Login 0');
+    var companyId = 0;
+    if(sessionStorage.getItem('companyId'))
+    {
+      companyId = Number(sessionStorage.getItem('companyId'));
+      //alert(lineCompanyId); 
+      //companyId = lineCompanyId;
+      //handleCompanyId(lineCompanyId);
     }
+    
+    //alert('Login 1');
+    if(Cookies.get('userInfo'))
+      {
+        Cookies.remove('userInfo');
+      } 
+      //alert('Login 2');
+      var userLocalJson = localStorage.getItem('userInfo');
+      Cookies.set('userInfo', userLocalJson);
+      var userLocal = JSON.parse(userLocalJson)
+      try
+      {
+        //alert('Login 3');
+        const expiredDate = await UserServices.fetchCoinposCheckExpired(
+          {
+            email:userLocal.email,
+            companyId:companyId
+          });
+        //alert('expiredDate = ' + expiredDate)
+        if(expiredDate === 'false')
+        {
+          //alert('Login 4');
+          dispatch({ type: 'USER_LOGIN', payload: userLocal });
+
+
+          sessionStorage.setItem('customerFirstName', userLocal.firstName);
+          sessionStorage.setItem('customerLastName', userLocal.lastName);
+          sessionStorage.setItem('customerEmail', userLocal.email);
+          sessionStorage.setItem('customerPhoneNumber', userLocal.phone);
+
+          sessionStorage.setItem('address1', userLocal.address1);
+          sessionStorage.setItem('countryId', userLocal.countryId);
+          sessionStorage.setItem('provinceId', userLocal.provinceId);
+          sessionStorage.setItem('cityId', userLocal.cityId);
+          sessionStorage.setItem('districtId', userLocal.districtId);
+          sessionStorage.setItem('postalcode', userLocal.postalcode);
+
+          //alert('countrys = ' + JSON.stringify(userLocal.countrys));
+          sessionStorage.setItem('countrys', JSON.stringify(userLocal.countrys));
+          sessionStorage.setItem('provinces', JSON.stringify(userLocal.provinces));
+          sessionStorage.setItem('cities', JSON.stringify(userLocal.cities));
+          sessionStorage.setItem('districts', JSON.stringify(userLocal.districts));
+        }
+        else
+        {
+          //alert('Login 5');
+          alert('Logout');
+          dispatch({ type: 'USER_LOGOUT' });
+          Cookies.remove('userInfo');
+          Cookies.remove('couponInfo');
+        }
+
+  
+        
+      }
+      catch(e)
+      {
+        alert("error = " + e.message);
+      }
+    /*if (!userInfo) {
+      router.push('/');
+    }*/
   }, []);
 
   return (
     <Layout
       title={title ? title : 'Dashboard'}
-      description={description ? description : 'This is User Dashboard'}
+      description={description ? description : 'This is User Dashboard' 
+      }
+      dataPath={dataPath}
+      companyName={companyName} locationName={locationName} companyLogo={companyLogo}  
+      locationAddress1={locationAddress1} locationAddress2={locationAddress2} locationCity={locationCity}
+      locationStateOrProvince={locationStateOrProvince} locationCountry={locationCountry} locationPostalCode={locationPostalCode}
+      locationEmail={locationEmail} locationTel={locationTel}
     >
       <div className="mx-auto max-w-screen-2xl px-3 sm:px-10">
         <div className="py-10 lg:py-12 flex flex-col lg:flex-row w-full">
@@ -87,29 +318,29 @@ const Dashboard = ({ title, description, children }) => {
                   <Card
                     title="Total Order"
                     Icon={FiShoppingCart}
-                    quantity={data.length}
+                    quantity={allOrderCount}//{data?.orders?.length}
                     className="text-red-600  bg-red-200"
                   />
                   <Card
                     title="Pending Order"
                     Icon={FiRefreshCw}
-                    quantity={pending.length}
+                    quantity={pendingOrderCount}//{pending.length}
                     className="text-orange-600 bg-orange-200"
                   />
                   <Card
                     title="Processing Order"
                     Icon={FiTruck}
-                    quantity={processing.length}
+                    quantity={processingOrderCount}//{processing.length}
                     className="text-indigo-600 bg-indigo-200"
                   />
                   <Card
                     title="Complete Order"
                     Icon={FiCheck}
-                    quantity={delivered.length}
+                    quantity={deliveredOrderCount}//{delivered.length}
                     className="text-emerald-600 bg-emerald-200"
                   />
                 </div>
-                <RecentOrder />
+                {/* <RecentOrder /> */}
               </div>
             )}
             {children}

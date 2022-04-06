@@ -6,7 +6,11 @@ import Image from 'next/image';
 //internal import
 import OrderTable from '@component/order/OrderTable';
 
-const Invoice = ({ data, printRef }) => {
+const Invoice = ({ data, printRef, companyName, locationName, companyLogo, currencySign, locationAddress1,locationAddress2,locationCity,locationStateOrProvince,locationCountry,locationPostalCode}) => {
+
+
+  
+
   return (
     <div ref={printRef}>
       <div className="bg-indigo-50 p-8 rounded-t-xl">
@@ -17,16 +21,21 @@ const Invoice = ({ data, printRef }) => {
               <Link href="/">
                 <a className="">
                   <Image
-                    width={110}
-                    height={40}
-                    src="/logo/logo-color.svg"
+                    width={70}
+                    height={70}
+                    src={companyLogo}
                     alt="logo"
                   />
                 </a>
               </Link>
             </h2>
+            <h2>{companyName}</h2>
+            <p className="text-sm text-gray-500">Location: {locationName}</p>
             <p className="text-sm text-gray-500">
-              Cecilia Chapman, 561-4535 Nulla LA, <br /> United States 96522{' '}
+              {locationAddress1} {locationAddress2} 
+                <br /> 
+                {locationCity} {locationStateOrProvince}
+                {locationCountry} {locationPostalCode}
             </p>
           </div>
         </div>
@@ -36,8 +45,11 @@ const Invoice = ({ data, printRef }) => {
               Date
             </span>
             <span className="text-sm text-gray-500 block">
-              {data.createdAt !== undefined && (
+              {/* {data.createdAt !== undefined && (
                 <span>{dayjs(data?.createdAt).format('MMMM D, YYYY')}</span>
+              )} */}
+              {data.orderDate !== undefined && (
+                <span>{dayjs(data?.orderDate).format('MMMM D, YYYY')}</span>
               )}
             </span>
           </div>
@@ -45,18 +57,19 @@ const Invoice = ({ data, printRef }) => {
             <span className="font-bold font-serif text-sm uppercase text-gray-600 block">
               Invoice No.
             </span>
-            <span className="text-sm text-gray-500 block">#{data.invoice}</span>
+            <span className="text-sm text-gray-500 block">#{data.invoiceNumber}</span>
           </div>
           <div className="flex flex-col lg:text-right text-left">
             <span className="font-bold font-serif text-sm uppercase text-gray-600 block">
               Invoice To.
             </span>
             <span className="text-sm text-gray-500 block">
-              {data.name}
+              {data.customerName}
               <br />
-              {data.address}
+              {data.shippingToAddress}
+              {/* {data.address}
               <br />
-              {data.city}, {data.country}, {data.zipCode}
+              {data.city}, {data.country}, {data.zipCode} */}
             </span>
           </div>
         </div>
@@ -100,17 +113,17 @@ const Invoice = ({ data, printRef }) => {
                   </th>
                 </tr>
               </thead>
-              <OrderTable data={data} />
+              <OrderTable data={data} currencySign={currencySign}/>
             </table>
           </div>
         </div>
       </div>
 
-      <div className="border-t border-b border-gray-100 p-10 bg-emerald-50">
+      <div className="border-t border-b border-gray-100 p-10 bg-cyan-50">
         <div className="flex lg:flex-row md:flex-row flex-col justify-between pt-4">
           <div className="mb-3 md:mb-0 lg:mb-0  flex flex-col sm:flex-wrap">
             <span className="mb-1 font-bold font-serif text-sm uppercase text-gray-600 block">
-              Payment Method
+              รูปแบบ ชำระเงิน
             </span>
             <span className="text-sm text-gray-500 font-semibold font-serif block">
               {data.paymentMethod}
@@ -118,26 +131,26 @@ const Invoice = ({ data, printRef }) => {
           </div>
           <div className="mb-3 md:mb-0 lg:mb-0  flex flex-col sm:flex-wrap">
             <span className="mb-1 font-bold font-serif text-sm uppercase text-gray-600 block">
-              Shipping Cost
+              ค่าขนส่ง
             </span>
             <span className="text-sm text-gray-500 font-semibold font-serif block">
-              ${Math.round(data.shippingCost)}.00
+              {currencySign}{Math.round(data.shippingFee)}.00
             </span>
           </div>
           <div className="mb-3 md:mb-0 lg:mb-0  flex flex-col sm:flex-wrap">
             <span className="mb-1 font-bold font-serif text-sm uppercase text-gray-600 block">
-              Discount
+              ส่วนลด
             </span>
             <span className="text-sm text-gray-500 font-semibold font-serif block">
-              ${Math.round(data.discount)}.00
+              {currencySign}{Math.round(data.totalDiscount)}.00
             </span>
           </div>
           <div className="flex flex-col sm:flex-wrap">
             <span className="mb-1 font-bold font-serif text-sm uppercase text-gray-600 block">
-              Total Amount
+              ยอดชำระรวม
             </span>
             <span className="text-2xl font-serif font-bold text-red-500 block">
-              ${Math.round(data.total)}.00
+              {currencySign}{Math.round(data.orderTotal)}.00
             </span>
           </div>
         </div>

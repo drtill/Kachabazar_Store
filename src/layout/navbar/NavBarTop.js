@@ -43,7 +43,7 @@ const NavBarTop = () => {
               </a>
             </span>
 
-            <div className="lg:text-right flex items-center">
+            {/* <div className="lg:text-right flex items-center">
               <Link href="/about-us">
                 <a className="font-medium hover:text-emerald-600">About Us</a>
               </Link>
@@ -68,7 +68,7 @@ const NavBarTop = () => {
                 </span>
                 Login
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

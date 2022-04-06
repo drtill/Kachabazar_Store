@@ -8,7 +8,7 @@ import { IoChevronForwardSharp } from 'react-icons/io5';
 import useAsync from '@hooks/useAsync';
 import CategoryServices from '@services/CategoryServices';
 
-const FeatureCategory = () => {
+const FeatureCategory = ({categories,FilterCategory, FilterProduct}) => {
   const router = useRouter();
   const { data, error } = useAsync(() => CategoryServices.getShowingCategory());
 
@@ -20,19 +20,29 @@ const FeatureCategory = () => {
         </p>
       ) : (
         <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6">
-          {data?.map((category, i) => (
+          <li className="group" key={0}>
+              <div
+                  
+                className="flex w-full h-full border border-gray-100 shadow-sm bg-white p-4 transition duration-200 ease-linear transform group-hover:shadow-lg"
+              >
+                <div className="flex items-center">
+                  <div className="pl-4">
+                    <h3 onClick={() =>
+                  
+                  FilterCategory(0)
+                } className="text-sm text-gray-600 cursor-pointer font-serif font-medium leading-tight line-clamp-1 group-hover:text-cyan-500">
+                      สินค้าทั้งหมด
+                    </h3>
+                    
+                  </div>
+                </div>
+              </div>
+            </li>
+          {categories?.map((category, i) => (
             <li className="group" key={i + 1}>
               <div
-                onClick={() =>
-                  router.push(
-                    `/search?Category=${category.parent
-                      .toLowerCase()
-                      .replace('&', '')
-                      .split(' ')
-                      .join('-')}`
-                  )
-                }
-                className="flex w-full h-full border border-gray-100 shadow-sm bg-white p-4 cursor-pointer transition duration-200 ease-linear transform group-hover:shadow-lg"
+                  
+                className="flex w-full h-full border border-gray-100 shadow-sm bg-white p-4 transition duration-200 ease-linear transform group-hover:shadow-lg"
               >
                 <div className="flex items-center">
                   <div>
@@ -44,26 +54,38 @@ const FeatureCategory = () => {
                     />
                   </div>
                   <div className="pl-4">
-                    <h3 className="text-sm text-gray-600 font-serif font-medium leading-tight line-clamp-1 group-hover:text-emerald-500">
+                    <h3 onClick={() =>
+                  /* router.push(
+                    `/search?Category=${category.parent
+                      .toLowerCase()
+                      .replace('&', '')
+                      .split(' ')
+                      .join('-')}`
+                  ) */
+                  FilterCategory(category._id)
+                } className="text-sm text-gray-600 cursor-pointer font-serif font-medium leading-tight line-clamp-1 group-hover:text-cyan-500">
                       {category.parent}
                     </h3>
                     <ul className="pt-1 mt-1">
+                      
                       {category.children.slice(0, 3).map((children) => (
-                        <li key={children} className="pt-1">
-                          <Link
-                            href={`/search?category=${children
+                        <li key={children._id} className="pt-1">
+                          <h3
+                            /* href={`/search?category=${children.title
                               .toLowerCase()
                               .replace('&', '')
                               .split(' ')
-                              .join('-')}`}
+                              .join('-')}`} */
+                              
+                              onClick={() => FilterProduct(category._id,children._id)}
                           >
-                            <a className="flex items-center font-serif text-xs text-gray-400 hover:text-emerald-600 cursor-pointer">
-                              <span className="text-xs text-gray-400 hover:text-emerald-600">
+                            <a className="flex items-center font-serif text-xs text-gray-400 hover:text-cyan-600 cursor-pointer">
+                              <span className="text-xs text-gray-400 hover:text-cyan-600">
                                 <IoChevronForwardSharp />
                               </span>
-                              {children}
+                              {children.title}
                             </a>
-                          </Link>
+                          </h3>
                         </li>
                       ))}
                     </ul>

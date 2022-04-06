@@ -11,24 +11,56 @@ import { SidebarContext } from '@context/SidebarContext';
 import CategoryServices from '@services/CategoryServices';
 import CategoryCard from '@component/category/CategoryCard';
 
-const Category = () => {
+const Category = ({companyLogo,FilterProduct}) => {
   const { categoryDrawerOpen, closeCategoryDrawer } =
     useContext(SidebarContext);
-  const { data, loading, error } = useAsync(() =>
-    CategoryServices.getShowingCategory()
-  );
+  //  const { data, loading, error } = useAsync(() =>
+  //   CategoryServices.getShowingCategory()
+  // ); 
+
+  var loading = true;
+  var error = '';
+  var categories = [];
+    if(sessionStorage.getItem('categories'))
+    {
+      //alert("Get Category");
+      var categoriesJson = sessionStorage.getItem('categories'); 
+      //alert("Get Category = " + categoriesJson);
+      //console.log(categories);
+      if(categoriesJson !== undefined)
+      {
+        try
+        {
+          categories = JSON.parse(categoriesJson);
+          //alert(JSON.stringify(categories));
+          loading = false;
+        }
+        catch(ex)
+        {
+          //alert("Catagory error : " + ex.message)
+        }
+        
+      }
+      
+    }
 
   return (
     <div className="flex flex-col w-full h-full bg-white cursor-pointer scrollbar-hide">
       {categoryDrawerOpen && (
-        <div className="w-full flex justify-between items-center h-16 px-6 py-4 bg-emerald-500 text-white border-b border-gray-100">
+        <div className="w-full flex justify-between items-center h-16 px-6 py-4 bg-cyan-500 text-white border-b border-gray-100">
           <h2 className="font-semibold font-serif text-lg m-0 text-heading flex align-center">
             <Link href="/">
               <a className="mr-10">
-                <Image
+                {/* <Image
                   width={100}
                   height={38}
                   src="/logo/logo-light.svg"
+                  alt="logo"
+                /> */}
+                <Image
+                  width={38}
+                  height={38}
+                  src={companyLogo === undefined ? 'http://coinpos-uat.azurewebsites.net/img/logo2.png' : companyLogo}
                   alt="logo"
                 />
               </a>
@@ -53,22 +85,32 @@ const Category = () => {
           <p className="flex justify-center align-middle items-center m-auto text-xl text-red-500">
             <span> {error}</span>
           </p>
-        ) : data.length === 0 ? (
+        ) : 
+        //data.length === 0
+        categories.length === 0 
+        ? (
           <Loading loading={loading} />
-        ) : (
+        ) 
+        : 
+        (
           <div className="relative grid gap-2 p-6">
-            {data?.map((category) => (
-              <CategoryCard
+            {categories?.map((category) => (
+              //categories.map((category) => (
+              
+                //category._id
+                <CategoryCard
                 key={category._id}
+                parentId={category._id}
                 title={category.parent}
                 icon={category.icon}
                 nested={category.children}
+                FilterProduct={FilterProduct}
               />
             ))}
           </div>
         )}
 
-        {categoryDrawerOpen && (
+        {/* {categoryDrawerOpen && (
           <div className="relative grid gap-2 mt-5">
             <h3 className="font-semibold font-serif text-lg m-0 text-heading flex align-center border-b px-8 py-3">
               Pages
@@ -78,20 +120,20 @@ const Category = () => {
                 <a
                   key={item.title}
                   href={item.href}
-                  className="p-2 flex font-serif items-center rounded-md hover:bg-gray-50 w-full hover:text-emerald-600"
+                  className="p-2 flex font-serif items-center rounded-md hover:bg-gray-50 w-full hover:text-cyan-600"
                 >
                   <item.icon
                     className="flex-shrink-0 h-4 w-4"
                     aria-hidden="true"
                   />
-                  <p className="inline-flex items-center justify-between ml-2 text-sm font-medium w-full hover:text-emerald-600">
+                  <p className="inline-flex items-center justify-between ml-2 text-sm font-medium w-full hover:text-cyan-600">
                     {item.title}
                   </p>
                 </a>
               ))}
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

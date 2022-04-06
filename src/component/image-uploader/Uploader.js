@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useDropzone } from 'react-dropzone';
 import { FiUploadCloud } from 'react-icons/fi';
+import { notifySuccess, notifyError } from '@utils/toast';
 
 const Uploader = ({ setImageUrl, imageUrl }) => {
   const [files, setFiles] = useState([]);
@@ -13,12 +14,36 @@ const Uploader = ({ setImageUrl, imageUrl }) => {
     multiple: false,
     maxSize: 100000, //the size of image,
     onDrop: (acceptedFiles) => {
+      //alert("Get Data = " + JSON.stringify(acceptedFiles));
+      //alert("Count Data = " + acceptedFiles.length);
+      
+      if(acceptedFiles.length === 0)
+      {
+        notifyError('Cannot accept large than 100KB image');
+        return;
+      }
+
+      var imgs = [];
+
+      acceptedFiles.map((file) => {
+        //alert("file = " + JSON.stringify(file));
+        var imgUrl = URL.createObjectURL(file);
+        //alert("imgUrl = " + imgUrl);
+        Object.assign(file, {
+          preview: imgUrl,
+        });
+
+        alert(JSON.stringify(file));
+        imgs.push(file);
+        setImageUrl(file.preview);
+      }
+      
+    )
+
+    //alert("imgs = " + JSON.stringify(imgs));
+
       setFiles(
-        acceptedFiles.map((file) =>
-          Object.assign(file, {
-            preview: URL.createObjectURL(file),
-          })
-        )
+        imgs
       );
     },
   });
@@ -52,6 +77,7 @@ const Uploader = ({ setImageUrl, imageUrl }) => {
           data: formData,
         })
           .then((res) => {
+            //alert(res.data.secure_url);
             setImageUrl(res.data.secure_url);
           })
           .catch((err) => console.log(err));
@@ -76,7 +102,7 @@ const Uploader = ({ setImageUrl, imageUrl }) => {
       >
         <input {...getInputProps()} />
         <span className="mx-auto flex justify-center">
-          <FiUploadCloud className="text-3xl text-emerald-500" />
+          <FiUploadCloud className="text-3xl text-cyan-500" />
         </span>
         <p className="text-sm mt-2">Drag your image here</p>
         <em className="text-xs text-gray-400">

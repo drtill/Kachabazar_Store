@@ -1,5 +1,6 @@
 import { useContext,useEffect, useState } from 'react';
 import { useCart} from 'react-use-cart';
+import { useRouter } from 'next/router'
 
 import { UserContext } from '@context/UserContext';
 
@@ -22,77 +23,106 @@ import ProductCard from '@component/product/ProductCard';
 import MainCarousel from '@component/carousel/MainCarousel';
 import FeatureCategory from '@component/category/FeatureCategory';
 
+import useCheckoutSubmit from '@hooks/useCheckoutSubmit';
+
 import Loading from '@component/preloader/Loading';
 
+import LoginModal from '@component/modal/LoginModal';
+//const liffId = process.env.NEXT_PUBLIC_LIFF_ID
 const isLiffLogin = true;//process.env.NEXT_PUBLIC_ISLOGIN
 var itemPerPage = 30;
+const Catalog = ({params,targetPage,companyCode,dataPath,title,description,countPage,currentPage,
+  products,salesOrder, orderDetails,categories,shippingServices,bankNameAndAccounts,
+  currencySign, companyName, locationName,companyLogo,
+  catalogCompanyId,catalogName,catalogLocationId,catalogOrderId,
+  customerFirstName,customerLastName,customerEmail, customerPhoneNumber,
+  address1,countryId,provinceId,cityId,districtId,postalcode,
+  countrys,provinces,cities,districts,
+  promotions,
+  locationAddress1,locationAddress2,locationCity,locationStateOrProvince,locationCountry,locationPostalCode,
+  locationEmail,locationTel,
+  companyFacebook,companyLine
+  }) => {
+   
+    const {
+      couponInfo,
+      couponRef,
+      setCouponData,
+      clearCouponData,
+      discountAmount,
+      
+    } = useCheckoutSubmit();
+    
+    const { dispatch } = useContext(UserContext);
 
-const Home = ({params,companyCode,dataPath,title,description,countPage,currentPage,
-    products,salesOrder, orderDetails,categories,shippingServices,bankNameAndAccounts,
-    currencySign, companyName, locationName,companyLogo,
-    catalogCompanyId,catalogName,catalogLocationId,catalogOrderId,
-    customerFirstName,customerLastName,customerEmail, customerPhoneNumber,
-    address1,countryId,provinceId,cityId,districtId,postalcode,
-    countrys,provinces,cities,districts,
-    promotions,
-    locationAddress1,locationAddress2,locationCity,locationStateOrProvince,locationCountry,locationPostalCode,
-    locationEmail,locationTel,
-    companyFacebook,companyLine
-    }) => {
-        const { dispatch } = useContext(UserContext);
+    const [modalOpen, setModalOpen] = useState(false);
     
+    const router = useRouter();
     
-        const [companyId, setCompanyId] = useState(catalogCompanyId);
-        const [locationId, setLocationId] = useState(catalogLocationId);
-        const [orderId, setOrderId] = useState(0);
-    
-        const [loading, setLoading] = useState(true);
-    
-        const [categoryLoading, setCategoryLoading] = useState(true);
-        const [newProductLoading, setNewProductLoading] = useState(true);
-    
-        const [promotionLoading, setPromotionLoading] = useState(false);
-    
-        //this.setState({liffId:liffData});
-        const [productList, setProductList] = useState([]);
-        const [newProductList, setNewProductList] = useState([]);
-        const [categoryList, setCategoryList] = useState([]);
-        const [lineProfileImage, setProfileImage] = useState('');
-        const [lineUserId, setLineUserId] = useState('');
-        const [linePOSId, setLinePOSId] = useState('');
-        const [lineUsername, setLineUsername] = useState('');
-        const [pagingIndent, setPaging] = useState([]);
-        const [companyNameData, setCompanyName] = useState(companyName);
-        const [catalogNameData, setCatalogName] = useState(catalogName);
-    
-        const [companyFacebookData, setCompanyFacebook] = useState(companyFacebook);
-        const [companyLineData, setCompanyLine] = useState(companyLine);
-    
-        const [locationNameData, setLocationName] = useState(locationName);
-        const [locationAddress1Data, setLocationAddress1] = useState(locationAddress1);
-        const [locationAddress2Data, setLocationAddress2] = useState(locationAddress2);
-        const [locationCityData, setLocationCity] = useState(locationCity);
-        const [locationStateOrProvinceData, setLocationStateOrProvince] = useState(locationStateOrProvince);
-        const [locationCountryData, setLocationCountry] = useState(locationCountry);
-        const [locationPostalCodeData, setLocationPostalCode] = useState(locationPostalCode);
-        const [locationEmailData, setLocationEmail] = useState(locationEmail);
-        const [locationTelData, setLocationTel] = useState(locationTel);
-        const [discountDataDetails,setDiscountDetail] = useState('');
-    
-        const [promotionCode,setPromotionCode] = useState('');
-    
-    
-        const { setItems,clearCartMetadata,emptyCart, addItem, items } = useCart();
+    const [companyId, setCompanyId] = useState(catalogCompanyId);
+    const [locationId, setLocationId] = useState(catalogLocationId);
+    const [orderId, setOrderId] = useState(0);
 
-  useEffect(async () => 
-  {
+    const [loading, setLoading] = useState(true);
 
-    if(Cookies.get('userInfo'))
+    const [categoryLoading, setCategoryLoading] = useState(true);
+    const [newProductLoading, setNewProductLoading] = useState(true);
+
+    const [promotionLoading, setPromotionLoading] = useState(false);
+
+    //this.setState({liffId:liffData});
+    const [productList, setProductList] = useState([]);
+    const [newProductList, setNewProductList] = useState([]);
+    const [categoryList, setCategoryList] = useState([]);
+    const [lineProfileImage, setProfileImage] = useState('');
+    const [lineUserId, setLineUserId] = useState('');
+    const [linePOSId, setLinePOSId] = useState('');
+    const [lineUsername, setLineUsername] = useState('');
+    const [pagingIndent, setPaging] = useState([]);
+    const [companyNameData, setCompanyName] = useState(companyName);
+    const [catalogNameData, setCatalogName] = useState(catalogName);
+
+    const [companyFacebookData, setCompanyFacebook] = useState(companyFacebook);
+    const [companyLineData, setCompanyLine] = useState(companyLine);
+
+    const [locationNameData, setLocationName] = useState(locationName);
+    const [locationAddress1Data, setLocationAddress1] = useState(locationAddress1);
+    const [locationAddress2Data, setLocationAddress2] = useState(locationAddress2);
+    const [locationCityData, setLocationCity] = useState(locationCity);
+    const [locationStateOrProvinceData, setLocationStateOrProvince] = useState(locationStateOrProvince);
+    const [locationCountryData, setLocationCountry] = useState(locationCountry);
+    const [locationPostalCodeData, setLocationPostalCode] = useState(locationPostalCode);
+    const [locationEmailData, setLocationEmail] = useState(locationEmail);
+    const [locationTelData, setLocationTel] = useState(locationTel);
+    const [discountDataDetails,setDiscountDetail] = useState('');
+
+    const [catalogPromotionId,setCatalogPromotionId] = useState(0);
+    const [promotionCode,setPromotionCode] = useState('');
+    const [catalogPromotionName,setCatalogPromotionName] = useState('');
+    const [catalogDiscountPercentage,setCatalogDiscountPercentage] = useState(0);
+    const [catalogPromotionIsAllProduct,setCatalogPromotionIsAllProduct] = useState(false);
+    const [catalogMinimumAmount,setCatalogMinimumAmount] = useState(0);
+    const [catalogProductType,setCatalogProductType] = useState('');
+
+    const [isCatalogPromotion,setIsCatalogPromotion] = useState(false);
+    
+    
+
+
+    const { setItems,clearCartMetadata,emptyCart, addItem, items } = useCart();
+    
+    
+    useEffect(async () => {
+
+      setPromotionLoading(true);
+      
+      //alert(JSON.stringify(promotions))
+      if(Cookies.get('userInfo'))
       {
         Cookies.remove('userInfo');
       } 
       var userLocalJson = localStorage.getItem('userInfo');
-      alert("userLocalJson = " + userLocalJson);
+      //alert("userLocalJson = " + userLocalJson);
       if(userLocalJson === null)
       {
         //alert('Logout');
@@ -112,17 +142,23 @@ const Home = ({params,companyCode,dataPath,title,description,countPage,currentPa
               companyId:catalogCompanyId
             });
             
-        alert('expiredDate = ' + expiredDate);
+          sessionStorage.setItem('expiredDate',expiredDate);
           if(expiredDate === false)
           {
             //alert('Login');
             dispatch({ type: 'USER_LOGIN', payload: userLocal });
 
 
+            //alert('userLocal.customerId = ' + userLocal.customerId)
+            sessionStorage.setItem('customerId', userLocal.customerId); 
             sessionStorage.setItem('customerFirstName', userLocal.firstName);
             sessionStorage.setItem('customerLastName', userLocal.lastName);
             sessionStorage.setItem('customerEmail', userLocal.email);
             sessionStorage.setItem('customerPhoneNumber', userLocal.phone);
+
+            //alert('address1 = '+ userLocal.address1)
+            //alert('countryId = '+ userLocal.countryId)
+            //alert('countryId = '+ JSON.stringify(userLocal.provinces))
 
             sessionStorage.setItem('address1', userLocal.address1);
             sessionStorage.setItem('countryId', userLocal.countryId);
@@ -133,12 +169,14 @@ const Home = ({params,companyCode,dataPath,title,description,countPage,currentPa
 
             sessionStorage.setItem('countrys', JSON.stringify(userLocal.countrys));
             sessionStorage.setItem('provinces', JSON.stringify(userLocal.provinces));
+            
             sessionStorage.setItem('cities', JSON.stringify(userLocal.cities));
             sessionStorage.setItem('districts', JSON.stringify(userLocal.districts));
           }
           else
           {
             //alert('Logout');
+            
             dispatch({ type: 'USER_LOGOUT' });
             Cookies.remove('userInfo');
             Cookies.remove('couponInfo');
@@ -149,9 +187,10 @@ const Home = ({params,companyCode,dataPath,title,description,countPage,currentPa
         }
         catch(e)
         {
-          alert("error = " + e.message);
+          //alert("error = " + e.message);
         }
       }
+      
       var getPromotionCode = localStorage.getItem('promotionCode')
 
       if(localStorage.getItem('promotionCode'))
@@ -172,7 +211,11 @@ const Home = ({params,companyCode,dataPath,title,description,countPage,currentPa
         sessionStorage.setItem('isForAllProduct', isForAllProduct);
         setPromotionCode(promotionCode);
       }
-      
+
+      //alert(JSON.stringify(countrys))
+      //alert('Storage = ' + sessionStorage.getItem('countrys'))
+      sessionStorage.setItem('countrys', 'JSON.stringify(countrys)');
+      sessionStorage.setItem('countrysJSON', JSON.stringify(countrys));
       sessionStorage.setItem('dataPath',dataPath);
       sessionStorage.setItem('catalogName',catalogName);
       sessionStorage.setItem('companyLogo',companyLogo);
@@ -204,7 +247,25 @@ const Home = ({params,companyCode,dataPath,title,description,countPage,currentPa
       sessionStorage.setItem('bankNameAndAccounts', JSON.stringify(bankNameAndAccounts));
       
       sessionStorage.setItem('currencySign', currencySign);
+      
+      //alert("customerFirstName = " + customerFirstName)
+      
 
+      //var userInf =  Cookies.get('userInfo');
+      //alert("Cookies = " + userInf);
+
+      //alert("localStorage");
+      //var userLocalJson = localStorage.getItem('userInfo');
+      //alert("UserLocal = " + userLocal);
+
+      //var userLocal = JSON.parse(userLocalJson);
+      //Cookies.set('userInfo', userLocalJson);
+      //dispatch({ type: 'USER_LOGIN', payload: userLocal });
+      
+
+
+
+      //alert("Cookie UserInfo")
       try
       {
         //Cookies.remove('userInfo');
@@ -250,39 +311,50 @@ const Home = ({params,companyCode,dataPath,title,description,countPage,currentPa
         }
         
         //alert('catalogLocationId = ' + catalogLocationId)
-        await GetProductData('','','','',0,catalogCompanyId,catalogLocationId,companyName,locationName,companyCode,catalogName,0,9,1,itemPerPage,'','','');
+        //alert('targetPage = ' + targetPage)
+        if(targetPage.length > 0)
+        {
+          //alert('Go');
+          if(targetPage === 'update-profile')
+          {
+            var userLocal = JSON.parse(userLocalJson)
+            alert('catalogName = ' + catalogName);
+            if (userLocal?.email) 
+            {
+              sessionStorage.setItem('catalogName',catalogName);
+              router.push('/user/' + targetPage);
+            } else {
+              sessionStorage.setItem('targetPage','/user/' + targetPage);
+              sessionStorage.setItem('catalogName',catalogName);
+              setModalOpen(!modalOpen);
+              //router.push('/user/' + targetPage);
+            }
+            
+          }
+          
+        }
+        else
+        {
+          await GetProductData('','','','',0,catalogCompanyId,catalogLocationId,companyName,locationName,companyCode,catalogName,0,9,1,itemPerPage,'','','');
+        }
+        
         
           
+        setPromotionLoading(false);
         setCategoryLoading(false);
         setNewProductLoading(false);
         setLoading(false);
       }
       catch (err) 
       {
-        alert(err.message);
+        //alert(err.message);
       }
-  //alert(countrys);
-  
+      
 
-  },[]);
+      
+    }, [])
 
-
-  const GetProductData = async(liffId,
-    lineUserId,
-    linePOSId,
-    groupId,
-    orderId,
-    companyId,
-    locationId,
-    companyName,
-    locationName,
-    companyCode,
-    catalogName,
-    promotionId,customerTypeId,page,itemPerPage,query,category,product) =>
-  {
-    //alert('locationId = ' + locationId);
-    const products = await ProductServices.getCoinPOSProductService({
-      liffId,
+    const GetProductData = async(liffId,
       lineUserId,
       linePOSId,
       groupId,
@@ -293,135 +365,171 @@ const Home = ({params,companyCode,dataPath,title,description,countPage,currentPa
       locationName,
       companyCode,
       catalogName,
-      promotionId,customerTypeId,page,itemPerPage,query,category,product
-    });
-
-    currentPage = products.currentPage;
-    countPage = products.countPage;
-
-    var productVariants = [];//products.productVariantPresenters;
-    var productCategories = [];
-
-    var newProductVariants = [];
-
-    if(products.productVariantPresenters !== null)
+      promotionId,customerTypeId,page,itemPerPage,query,category,product) =>
     {
-      for(var i = 0;i < products.productVariantPresenters.length; i++)
+      alert('locationId = ' + locationId);
+      const products = await ProductServices.fetchGetCoinPOSProductService({
+        liffId,
+        lineUserId,
+        linePOSId,
+        groupId,
+        orderId,
+        companyId,
+        locationId,
+        companyName,
+        locationName,
+        companyCode,
+        catalogName,
+        promotionId,customerTypeId,page,itemPerPage,query,category,product
+      });
+
+      //alert(JSON.stringify(products));
+      //alert(JSON.stringify(products.catalogCouponCode));
+      if(products.catalogCouponCode !== undefined)
       {
-        var productItem = {};
-        productItem['_id'] = Number(products.productVariantPresenters[i].ProductVariantId);
-        productItem['title'] = products.productVariantPresenters[i].Name;
-        productItem['quantity'] = products.productVariantPresenters[i].StockLevel;
-        productItem['image'] = products.productVariantPresenters[i].ImageUrl;
-        productItem['unit'] = products.productVariantPresenters[i].UPC;
-        productItem['slug'] = products.productVariantPresenters[i].UPC;
-        productItem['tag'] = products.productVariantPresenters[i].ProductId;
-        productItem['originalPrice'] = products.productVariantPresenters[i].Price;
-        productItem['price'] = products.productVariantPresenters[i].Price;
-        productItem['type'] = 'W';
-        productItem['sku'] = products.productVariantPresenters[i].SKU;
-        productItem['discount'] = 0;
-        productItem['description'] = products.productVariantPresenters[i].Description;
-        productItem['currencySign'] = products.currencySign;
-      
+        //alert("Have Promotion")
+        setCatalogPromotionId(Number(products.catalogPromotionId));
+        setPromotionCode(products.catalogCouponCode);
+        setCatalogPromotionName(products.catalogPromotionName);
+        setCatalogDiscountPercentage(products.catalogDiscountPercentage)
+        setCatalogPromotionIsAllProduct(products.catalogIsAllProduct);
+        setCatalogMinimumAmount(products.catalogMinimumAmount);
+        setCatalogProductType(products.catalogProductType)
 
-
-        productVariants.push(productItem);
+        SetPromotionData(products.catalogCouponCode,products.catalogEndTime,products.catalogMinimumAmount,products.catalogDiscountPercentage,true);
       }
-    }
-
-    if(products.newProductVariantPresenters !== null)
-    {
-      for(var i = 0;i < products.newProductVariantPresenters.length; i++)
-      {
-        var productItem = {};
-        productItem['_id'] = Number(products.newProductVariantPresenters[i].ProductVariantId);
-        productItem['title'] = products.newProductVariantPresenters[i].Name;
-        productItem['quantity'] = products.newProductVariantPresenters[i].StockLevel;
-        productItem['image'] = products.newProductVariantPresenters[i].ImageUrl;
-        productItem['unit'] = products.newProductVariantPresenters[i].UPC;
-        productItem['slug'] = products.newProductVariantPresenters[i].UPC;
-        productItem['tag'] = products.newProductVariantPresenters[i].ProductId;
-        productItem['originalPrice'] = products.newProductVariantPresenters[i].Price;
-        productItem['price'] = products.newProductVariantPresenters[i].Price;
-        productItem['type'] = 'W';
-        productItem['sku'] = products.newProductVariantPresenters[i].SKU;
-        productItem['discount'] = 0;
-        productItem['description'] = products.newProductVariantPresenters[i].Description;
-        productItem['currencySign'] = products.currencySign;
+      
+      sessionStorage.setItem('customerTypeId',products.customerTypeId);
+      sessionStorage.setItem('promotionId',products.promotionId);
+      
       
 
+      currentPage = products.currentPage;
+      countPage = products.countPage;
 
-        newProductVariants.push(productItem);
-      }
-    }
+      var productVariants = [];//products.productVariantPresenters;
+      var productCategories = [];
 
-    if(products.productCategoryPresenters !== null)
-    {
-      for(var j = 0;j < products.productCategoryPresenters.length; j++)
+      var newProductVariants = [];
+
+      if(products.productVariantPresenters !== null)
       {
-
-      
-        var nests = [];
-        for(var k = 0;k < products.productCategoryPresenters[j].Products.length; k++)
+        for(var i = 0;i < products.productVariantPresenters.length; i++)
         {
-          var children = {};
-          children['_id'] = Number(products.productCategoryPresenters[j].Products[k].ProductId);
-          children['title'] = products.productCategoryPresenters[j].Products[k].Name;
-          nests.push(children);
+          var productItem = {};
+          productItem['_id'] = Number(products.productVariantPresenters[i].ProductVariantId);
+          productItem['title'] = products.productVariantPresenters[i].Name;
+          productItem['quantity'] = products.productVariantPresenters[i].StockLevel;
+          productItem['image'] = products.productVariantPresenters[i].ImageUrl;
+          productItem['unit'] = products.productVariantPresenters[i].UPC;
+          productItem['slug'] = products.productVariantPresenters[i].UPC;
+          productItem['tag'] = products.productVariantPresenters[i].ProductId;
+          productItem['originalPrice'] = products.productVariantPresenters[i].Price;
+          productItem['price'] = products.productVariantPresenters[i].Price;
+          productItem['type'] = 'W';
+          productItem['sku'] = products.productVariantPresenters[i].SKU;
+          productItem['discount'] = 0;
+          productItem['description'] = products.productVariantPresenters[i].Description;
+          productItem['currencySign'] = products.currencySign;
+        
+
+
+          productVariants.push(productItem);
         }
-        
-
-        
-        var productCategory = {};
-        productCategory['_id'] = Number(products.productCategoryPresenters[j].CategoryId);
-        productCategory['parent'] = products.productCategoryPresenters[j].Name;
-        productCategory['icon'] = products.productCategoryPresenters[j].ImageUrl;
-        productCategory['children'] = nests;
-
-        productCategories.push(productCategory);
-
-
       }
-    }
-    var orderData = {};
-    var orderDetailDatas = [];
-    if(products.orderDetails !== null)
-    {
-      for(var i = 0;i < products.orderDetails.length; i++)
-      {
-        var orderDetailItem = {};
-        orderDetailItem['_id'] = products.orderDetails[i].orderDetailId;
-        orderDetailItem['upc'] = products.orderDetails[i].upc;
-        orderDetailItem['orderId'] = products.orderDetails[i].orderId;
-        orderDetailItem['productVariantId'] = products.orderDetails[i].productVariantId;
-        orderDetailItem['productVariantName'] = products.orderDetails[i].productVariantName;
-        orderDetailItem['sku'] = products.orderDetails[i].sku;
-        orderDetailItem['productVariantPrice'] = products.orderDetails[i].productVariantPrice;
-        orderDetailItem['locationId'] = products.orderDetails[i].locationId;
-        orderDetailItem['discount'] = products.orderDetails[i].discount;
-        orderDetailItem['quantity'] = products.orderDetails[i].quantity;
-        orderDetailItem['imageUrl'] = products.orderDetails[i].imageUrl;
-        orderDetailItem['lineOrder'] = products.orderDetails[i].lineOrder;
-
-        orderDetailDatas.push(orderDetailItem);
-
-      }
-    }
-
-    //alert(JSON.stringify("category Data = " + productCategories))
-    sessionStorage.setItem('categories', JSON.stringify(productCategories));
-
-    pagingManager();
-    setCategoryList(productCategories);
-    setProductList(productVariants);
-
-    setNewProductList(newProductVariants);
-
   
+      if(products.newProductVariantPresenters !== null)
+      {
+        for(var i = 0;i < products.newProductVariantPresenters.length; i++)
+        {
+          var productItem = {};
+          productItem['_id'] = Number(products.newProductVariantPresenters[i].ProductVariantId);
+          productItem['title'] = products.newProductVariantPresenters[i].Name;
+          productItem['quantity'] = products.newProductVariantPresenters[i].StockLevel;
+          productItem['image'] = products.newProductVariantPresenters[i].ImageUrl;
+          productItem['unit'] = products.newProductVariantPresenters[i].UPC;
+          productItem['slug'] = products.newProductVariantPresenters[i].UPC;
+          productItem['tag'] = products.newProductVariantPresenters[i].ProductId;
+          productItem['originalPrice'] = products.newProductVariantPresenters[i].Price;
+          productItem['price'] = products.newProductVariantPresenters[i].Price;
+          productItem['type'] = 'W';
+          productItem['sku'] = products.newProductVariantPresenters[i].SKU;
+          productItem['discount'] = 0;
+          productItem['description'] = products.newProductVariantPresenters[i].Description;
+          productItem['currencySign'] = products.currencySign;
+        
+
+
+          newProductVariants.push(productItem);
+        }
+      }
+
+      if(products.productCategoryPresenters !== null)
+      {
+        for(var j = 0;j < products.productCategoryPresenters.length; j++)
+        {
+
+        
+          var nests = [];
+          for(var k = 0;k < products.productCategoryPresenters[j].Products.length; k++)
+          {
+            var children = {};
+            children['_id'] = Number(products.productCategoryPresenters[j].Products[k].ProductId);
+            children['title'] = products.productCategoryPresenters[j].Products[k].Name;
+            nests.push(children);
+          }
+          
+
+          
+          var productCategory = {};
+          productCategory['_id'] = Number(products.productCategoryPresenters[j].CategoryId);
+          productCategory['parent'] = products.productCategoryPresenters[j].Name;
+          productCategory['icon'] = products.productCategoryPresenters[j].ImageUrl;
+          productCategory['children'] = nests;
+
+          productCategories.push(productCategory);
+
+
+        }
+      }
+      var orderData = {};
+      var orderDetailDatas = [];
+      if(products.orderDetails !== null)
+      {
+        for(var i = 0;i < products.orderDetails.length; i++)
+        {
+          var orderDetailItem = {};
+          orderDetailItem['_id'] = products.orderDetails[i].orderDetailId;
+          orderDetailItem['upc'] = products.orderDetails[i].upc;
+          orderDetailItem['orderId'] = products.orderDetails[i].orderId;
+          orderDetailItem['productVariantId'] = products.orderDetails[i].productVariantId;
+          orderDetailItem['productVariantName'] = products.orderDetails[i].productVariantName;
+          orderDetailItem['sku'] = products.orderDetails[i].sku;
+          orderDetailItem['productVariantPrice'] = products.orderDetails[i].productVariantPrice;
+          orderDetailItem['locationId'] = products.orderDetails[i].locationId;
+          orderDetailItem['discount'] = products.orderDetails[i].discount;
+          orderDetailItem['quantity'] = products.orderDetails[i].quantity;
+          orderDetailItem['imageUrl'] = products.orderDetails[i].imageUrl;
+          orderDetailItem['lineOrder'] = products.orderDetails[i].lineOrder;
+
+          orderDetailDatas.push(orderDetailItem);
+
+        }
+      }
+
+      //alert(JSON.stringify("category Data = " + productCategories))
+      sessionStorage.setItem('categories', JSON.stringify(productCategories));
+
+      pagingManager();
+      setCategoryList(productCategories);
+      setProductList(productVariants);
+
+      setNewProductList(newProductVariants);
+
+    
 
 }
-  
+
 const CancelPromotionCode = async(promotionCode) =>
 {
   var orderId = catalogOrderId;
@@ -453,11 +561,30 @@ const CancelPromotionCode = async(promotionCode) =>
           localStorage.removeItem('isForAllProduct');
 
           setDiscountDetail(undefined)
+
+          clearCouponData();
 }
 
+const SetPromotionData = (promotionCode,promotionEndTime,promotionMinimumAmount,promotionDiscountRate, isAuto) =>
+{
+  var couponData = [];
+  
+  var couponDetail = {
+    couponCode:promotionCode,
+    endTime:promotionEndTime,
+    minimumAmount:promotionMinimumAmount,
+    discountPercentage:promotionDiscountRate,
+
+  };
+  couponData.push(couponDetail);
+          
+  sessionStorage.setItem('couponInfo', JSON.stringify(couponData));
+  setCouponData(promotionCode, couponData, isAuto);
+}
 
     const ApplyPromotionCode = async(promotionCode,discountPercentage, isForAllProduct, minimumAmount, productIdList) =>
     {
+      setPromotionLoading(true);
       //alert(sessionStorage.getItem('discountDetails'));
       //if(getPromotionCode !== null)
       //{
@@ -547,35 +674,50 @@ const CancelPromotionCode = async(promotionCode) =>
 
           setDiscountDetail(JSON.stringify(discountDetails))
 
+          setPromotionLoading(false);
+
+          SetPromotionData(promotionCode,promotion.endTime,promotion.minimumAmount,promotion.discountRate, false);
+          
           
 
     }
     const SearchProduct = async (searchText) => 
     {
       //alert("Searching = " + searchText);
+      var customerTypeId = sessionStorage.getItem('customerTypeId') ? Number(sessionStorage.getItem('customerTypeId')) : 9;//Default Customer
+      var promotionId = sessionStorage.getItem('promotionId') ? Number(sessionStorage.getItem('promotionId')) : 0;
+      //alert("promotionId = " + promotionId + ", customerTypeId = " + customerTypeId);
       RefreshProductList("","","","",catalogOrderId === undefined ? 0 : catalogOrderId,
       catalogCompanyId,companyCode,
       catalogLocationId === undefined ? 0 : catalogLocationId ,
       catalogName,
-      '','',0,9,1,30,searchText)
+      '','',promotionId,customerTypeId,1,itemPerPage,searchText)
     }
     const FilterCategory = async (categoty) => 
     {
+      
       //alert("categoty = " + categoty);
+
+      var customerTypeId = sessionStorage.getItem('customerTypeId') ? Number(sessionStorage.getItem('customerTypeId')) : 9;//Default Customer
+      var promotionId = sessionStorage.getItem('promotionId') ? Number(sessionStorage.getItem('promotionId')) : 0;
+      //alert("promotionId = " + promotionId + ", customerTypeId = " + customerTypeId);
       RefreshProductList("","","","",catalogOrderId === undefined ? 0 : catalogOrderId,
       catalogCompanyId,companyCode,
       catalogLocationId === undefined ? 0 : catalogLocationId ,
       catalogName,
-      '','',0,9,1,30,'',categoty)
+      '','',promotionId,customerTypeId,1,itemPerPage,'',categoty)
     }
     const FilterProduct = async (category,product) => 
     {
-      //alert("product = " + product);
+      
+      var customerTypeId = sessionStorage.getItem('customerTypeId') ? Number(sessionStorage.getItem('customerTypeId')) : 9;//Default Customer
+      var promotionId = sessionStorage.getItem('promotionId') ? Number(sessionStorage.getItem('promotionId')) : 0;
+      //alert("promotionId = " + promotionId + ", customerTypeId = " + customerTypeId);
       RefreshProductList("","","","",catalogOrderId === undefined ? 0 : catalogOrderId,
       catalogCompanyId,companyCode,
       catalogLocationId === undefined ? 0 : catalogLocationId ,
       catalogName,
-      '','',0,9,1,30,'',category,product)
+      '','',promotionId,customerTypeId,1,itemPerPage,'',category,product)
     }
     const RefreshProductList = async (liffId, lineUserId, linePOSId, groupId, orderId,companyId,companyCode,locationId,catalogName,companyName, locationName, promotionId,customerTypeId,page,itemPerPage,query,category,product) =>
     {
@@ -584,8 +726,8 @@ const CancelPromotionCode = async(promotionCode) =>
       query = query === undefined ? 'null' : query;
       category = category === undefined ? 'null' : category;
       product = product === undefined ? 'null' : product;
-      //alert("query = " + query);
-      const products = await ProductServices.getCoinPOSProductService({
+      //alert("customerTypeId = " + customerTypeId);
+      const products = await ProductServices.fetchRefreshCoinPOSProductService({
         liffId,
         lineUserId,
         linePOSId,
@@ -601,33 +743,38 @@ const CancelPromotionCode = async(promotionCode) =>
         promotionId,customerTypeId,page,itemPerPage,query:query,category,product
       });
 
-      //alert(JSON.stringify(products));
+      
       currentPage = products.currentPage;
+      countPage = products.countPage;
       var productVariants = [];//products.productVariantPresenters;
-      if(products.productVariantPresenters !== null)
+      if(products !== undefined)
       {
-        for(var i = 0;i < products.productVariantPresenters.length; i++)
+        if(products.productVariantPresenters !== undefined)
         {
-          var productItem = {};
-          productItem['_id'] = Number(products.productVariantPresenters[i].ProductVariantId);
-          productItem['title'] = products.productVariantPresenters[i].Name;
-          productItem['quantity'] = products.productVariantPresenters[i].StockLevelDisplay;
-          productItem['image'] = products.productVariantPresenters[i].ImageUrl;
-          productItem['unit'] = products.productVariantPresenters[i].UPC;
-          productItem['slug'] = products.productVariantPresenters[i].UPC;
-          productItem['tag'] = products.productVariantPresenters[i].ProductId;
-          productItem['originalPrice'] = products.productVariantPresenters[i].PriceDisplay;
-          productItem['price'] = products.productVariantPresenters[i].PriceDisplay;
-          productItem['type'] = 'W';
-          productItem['sku'] = products.productVariantPresenters[i].SKU;
-          productItem['discount'] = 0;
-          productItem['description'] = products.productVariantPresenters[i].Description;
-          productItem['currencySign'] = products.currencySign;
+          for(var i = 0;i < products.productVariantPresenters.length; i++)
+          {
+            var productItem = {};
+            productItem['_id'] = Number(products.productVariantPresenters[i].ProductVariantId);
+            productItem['title'] = products.productVariantPresenters[i].Name;
+            productItem['quantity'] = products.productVariantPresenters[i].StockLevelDisplay;
+            productItem['image'] = products.productVariantPresenters[i].ImageUrl;
+            productItem['unit'] = products.productVariantPresenters[i].UPC;
+            productItem['slug'] = products.productVariantPresenters[i].UPC;
+            productItem['tag'] = products.productVariantPresenters[i].ProductId;
+            productItem['originalPrice'] = products.productVariantPresenters[i].PriceDisplay;
+            productItem['price'] = products.productVariantPresenters[i].PriceDisplay;
+            productItem['type'] = 'W';
+            productItem['sku'] = products.productVariantPresenters[i].SKU;
+            productItem['discount'] = 0;
+            productItem['description'] = products.productVariantPresenters[i].Description;
+            productItem['currencySign'] = products.currencySign;
 
 
-          productVariants.push(productItem);
+            productVariants.push(productItem);
+          }
         }
       }
+      
       
 
       pagingManager();
@@ -722,195 +869,250 @@ const CancelPromotionCode = async(promotionCode) =>
     }
     
 
-  return (
-    <>
-  <Layout title={title} description={description} dataPath={dataPath} companyName={companyName} locationName={locationName} companyLogo={companyLogo} 
-  locationAddress1={locationAddress1} locationAddress2={locationAddress2} locationCity={locationCity}
-  locationStateOrProvince={locationStateOrProvince} locationCountry={locationCountry} locationPostalCode={locationPostalCode}
-  locationEmail={locationEmail} locationTel={locationTel}
-  RefreshProductList={SearchProduct} FilterProduct={FilterProduct} >
-    <div className="min-h-screen">
-      <StickyCart discountDetails={discountDataDetails} currencySign={currencySign}/>
-      <div className="bg-white">
-        <div className="mx-auto py-5 max-w-screen-2xl px-3 sm:px-10">
-          <div className="flex w-full">
-            {/* {dataPath} */}
-          <OfferCard promotions={promotions} selectedPromotion={promotionCode} companyId={catalogCompanyId} catalogName={catalogName} ApplyPromotionCode={ApplyPromotionCode} CancelPromotionCode={CancelPromotionCode}/>
-            {/* <div className="grid gap-4 mb-8 md:grid-cols-2 xl:grid-cols-2">
-              
-              <OfferCard promotions={promotions} companyId={catalogCompanyId} ApplyPromotionCode={ApplyPromotionCode}/>
-            </div> */}
-            {/* <div className="flex-shrink-0 xl:pr-6 lg:block w-full lg:w-3/5">
-              <MainCarousel />
-            </div> */}
-            {/* <div className="w-full lg:flex">
-              <OfferCard promotions={promotions} companyId={catalogCompanyId} ApplyPromotionCode={ApplyPromotionCode}/>
-            </div> */}
-          </div>
-          {/* <div className="bg-orange-100 px-10 py-6 rounded-lg mt-6 hidden lg:block">
-            <Banner />
-          </div> */}
-        </div>
-      </div>
 
-      <div id="newProduct"
-        className="bg-gray-50 lg:py-16 py-10 mx-auto max-w-screen-2xl px-3 sm:px-10"
-      >
-        <div className="mb-10 flex justify-center">
-          <div className="text-center w-full lg:w-2/5">
-            <h2 className="text-xl lg:text-2xl mb-2 font-serif font-semibold">
-              Latest New Products
-            </h2>
-            
-          </div>
-        </div>
-        {
-            newProductLoading ? (
-              <Loading loading={newProductLoading} />
-            )
-            :
-            (
-              <div className="flex">
-                <div className="w-full">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3 lg:gap-3">
-                    {newProductList.map((product) => (
-                      <ProductCard key={product._id} product={product} liffId={""} lineUserId={""} 
-                      linePOSId={""} groupId={""} orderId={catalogOrderId} companyId={catalogCompanyId} locationId={catalogLocationId} pictureUrl={lineProfileImage} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )
-          }
-        
-      </div>
-      {/* feature category's */}
-      <div className="bg-gray-100 lg:py-16 py-10">
-        <div className="mx-auto max-w-screen-2xl px-3 sm:px-10">
-          <div className="mb-10 flex justify-center">
-            <div className="text-center w-full lg:w-2/5">
-              <h2 className="text-xl lg:text-2xl mb-2 font-serif font-semibold">
-                Featured Categories
-              </h2>
-              <p className="text-base font-sans text-gray-600 leading-6">
-                เลือกหมวดหมู่สินค้า เพื่อค้นหาสินค้าที่ตรงใจคุณอย่างรวดเร็ว
-              </p>
-            </div>
-          </div>
-          {
-            categoryLoading ? (
-              <Loading loading={categoryLoading} />
-            )
-            :
-            (
-              <FeatureCategory categories={categoryList} FilterCategory={FilterCategory} FilterProduct={FilterProduct}/>
-            )
-          }
-          
-        </div>
-      </div>
 
-      {/* popular products */}
-      <div className="bg-gray-50 lg:py-16 py-10 mx-auto max-w-screen-2xl px-3 sm:px-10">
-        <div className="mb-10 flex justify-center">
-          <div className="text-center w-full lg:w-2/5">
-            <h2 className="text-xl lg:text-2xl mb-2 font-serif font-semibold">
-              สินค้าทั้งหมด สำหรับการช็อปปิ้งของคุณ
-            </h2>
-            
-          </div>
-        </div>
-        {
-          loading ? (
-            <Loading loading={loading} />
-          )
-          :
-          (
-            <>
-              <div className="flex">
-                <div className="w-full">
-                  
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3 lg:gap-3">
-                    {productList?.map((product) => (
-                      <ProductCard key={product._id} product={product} liffId={""} lineUserId={""} 
-                      linePOSId={""} groupId={""} orderId={catalogOrderId} companyId={catalogCompanyId} locationId={catalogLocationId} pictureUrl={lineProfileImage}  />
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <div className="flex">
-                <div className="w-full">
-                <div id="pagingProduct" className=" lg:py-16 bg-repeat bg-center overflow-hidden">
-                  <div className="max-w-screen-2xl mx-auto px-4 sm:px-10">
-                    <div className="grid grid-cols-1 gap-2 md:gap-3 lg:gap-3 items-center">
-                      
-                      <div className="text-center">
-                        
-                        <div className="mt-2">
-                          {pagingIndent}
+
+    return (
+        <>
+        {modalOpen && (
+          <LoginModal modalOpen={modalOpen} setModalOpen={setModalOpen} targetPage={targetPage} />
+        )}
+      <Layout title={title} description={description} dataPath={dataPath} companyName={companyName} locationName={locationName} companyLogo={companyLogo} 
+      locationAddress1={locationAddress1} locationAddress2={locationAddress2} locationCity={locationCity}
+      locationStateOrProvince={locationStateOrProvince} locationCountry={locationCountry} locationPostalCode={locationPostalCode}
+      locationEmail={locationEmail} locationTel={locationTel}
+      RefreshProductList={SearchProduct} FilterProduct={FilterProduct} >
+        <div className="min-h-screen">
+          <StickyCart discountDetails={discountDataDetails} currencySign={currencySign}/>
+          <div className="bg-white">
+            <div className="mx-auto py-5 max-w-screen-2xl px-3 sm:px-10">
+              {catalogPromotionId === 0 
+              ?
+                promotionLoading ?
+                  <div className="bg-gray-100 lg:py-16 py-10">
+                    <div className="mx-auto max-w-screen-2xl px-3 sm:px-10">
+                    
+                      <div className="mb-10 flex justify-center">
+                        <div className="text-center w-full lg:w-2/5">
+                          <Loading loading={promotionLoading} />
+                          <p className="text-base font-sans text-gray-600 leading-6">
+                          กำลังปรับปรุงส่วนลด กรุณารอสักครู่
+                          </p>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                
+                :
+                  <OfferCard promotions={promotions} selectedPromotion={promotionCode} companyId={catalogCompanyId} catalogName={catalogName} ApplyPromotionCode={ApplyPromotionCode} CancelPromotionCode={CancelPromotionCode}/>
+                
+                
+                 
+                
+              :
+                <div className="bg-orange-100 px-10 py-6 rounded-lg mt-6 lg:block">
+                  <Banner promotionName={catalogPromotionName} discountPercentage={catalogDiscountPercentage} promotionIsAllProduct={catalogPromotionIsAllProduct} 
+                      minimumAmount={catalogMinimumAmount} currencySign={currencySign} productType={catalogProductType}/>
+                </div>
+                  /* <div className="bg-orange-100 px-10 py-6 rounded-lg mt-6 hidden lg:block">
+                      <Banner promotionName={catalogPromotionName} discountPercentage={catalogDiscountPercentage} promotionIsAllProduct={catalogPromotionIsAllProduct} 
+                      minimumAmount={catalogMinimumAmount} currencySign={currencySign} productType={catalogProductType}/>
+                    </div> */}
+              {/* <div className="flex w-full"> */}
+                {/* {dataPath} */}
+                
+                
+                {/* <div className="grid gap-4 mb-8 md:grid-cols-2 xl:grid-cols-2">
+                  
+                  <OfferCard promotions={promotions} companyId={catalogCompanyId} ApplyPromotionCode={ApplyPromotionCode}/>
+                </div> */}
+                {/* <div className="flex-shrink-0 xl:pr-6 lg:block w-full lg:w-3/5">
+                  <MainCarousel />
+                </div> */}
+                {/* <div className="w-full lg:flex">
+                  <OfferCard promotions={promotions} companyId={catalogCompanyId} ApplyPromotionCode={ApplyPromotionCode}/>
+                </div> */}
+              {/* </div> */}
+              {/* <div className="bg-orange-100 px-10 py-6 rounded-lg mt-6 hidden lg:block">
+                <Banner />
+              </div> */}
+            </div>
+          </div>
+
+          <div id="newProduct"
+            className="bg-gray-50 lg:py-16 py-10 mx-auto max-w-screen-2xl px-3 sm:px-10"
+          >
+            <div className="mb-10 flex justify-center">
+              <div className="text-center w-full lg:w-2/5">
+                <h2 className="text-xl lg:text-2xl mb-2 font-serif font-semibold">
+                  Latest New Products
+                </h2>
+                
+              </div>
+            </div>
+            {
+                newProductLoading ? (
+                  <Loading loading={newProductLoading} />
+                )
+                :
+                (
+                  <div className="flex">
+                    <div className="w-full">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3 lg:gap-3">
+                        {newProductList.map((product) => (
+                          <ProductCard key={product._id} product={product} liffId={""} lineUserId={""} 
+                          linePOSId={""} groupId={""} orderId={catalogOrderId} companyId={catalogCompanyId} locationId={catalogLocationId} pictureUrl={lineProfileImage} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )
+              }
+            
+          </div>
+          {/* feature category's */}
+          <div className="bg-gray-100 lg:py-16 py-10">
+            <div className="mx-auto max-w-screen-2xl px-3 sm:px-10">
+              <div className="mb-10 flex justify-center">
+                <div className="text-center w-full lg:w-2/5">
+                  <h2 className="text-xl lg:text-2xl mb-2 font-serif font-semibold">
+                    Featured Categories
+                  </h2>
+                  <p className="text-base font-sans text-gray-600 leading-6">
+                    เลือกหมวดหมู่สินค้า เพื่อค้นหาสินค้าที่ตรงใจคุณอย่างรวดเร็ว
+                  </p>
+                </div>
+              </div>
+              {
+                categoryLoading ? (
+                  <Loading loading={categoryLoading} />
+                )
+                :
+                (
+                  <FeatureCategory categories={categoryList} FilterCategory={FilterCategory} FilterProduct={FilterProduct}/>
+                )
+              }
+              
+            </div>
+          </div>
+
+          {/* popular products */}
+          <div className="bg-gray-50 lg:py-16 py-10 mx-auto max-w-screen-2xl px-3 sm:px-10">
+            <div className="mb-10 flex justify-center">
+              <div className="text-center w-full lg:w-2/5">
+                <h2 className="text-xl lg:text-2xl mb-2 font-serif font-semibold">
+                  สินค้าทั้งหมด สำหรับการช็อปปิ้งของคุณ
+                </h2>
+                
+              </div>
+            </div>
+            {
+              loading ? (
+                <Loading loading={loading} />
+              )
+              :
+              (
+                <>
+                  <div className="flex">
+                    <div className="w-full">
+                      
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3 lg:gap-3">
+                        {productList?.map((product) => (
+                          <ProductCard key={product._id} product={product} liffId={""} lineUserId={""} 
+                          linePOSId={""} groupId={""} orderId={catalogOrderId} companyId={catalogCompanyId} locationId={catalogLocationId} pictureUrl={lineProfileImage}  />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex">
+                    <div className="w-full">
+                    <div id="pagingProduct" className=" lg:py-16 bg-repeat bg-center overflow-hidden">
+                      <div className="max-w-screen-2xl mx-auto px-4 sm:px-10">
+                        <div className="grid grid-cols-1 gap-2 md:gap-3 lg:gap-3 items-center">
+                          
+                          <div className="text-center">
+                            
+                            <div className="mt-2">
+                              {pagingIndent}
+                            </div>
+                          </div>
+                          
+                        </div>
+                      </div>
+                    </div>
                       
                     </div>
                   </div>
-                </div>
-                  
+                </>
+                
+              )    
+            }
+            
+          </div>
+
+          {/* promotional banner card */}
+          {/* <div className="block mx-auto max-w-screen-2xl">
+            <div className="mx-auto max-w-screen-2xl px-4 sm:px-10">
+              <div className="lg:p-16 p-6 bg-emerald-500 shadow-sm border rounded-lg">
+                <CardTwo />
+              </div>
+            </div>
+          </div> */}
+
+          {/* discounted products */}
+          {/* <div
+            id="discount"
+            className="bg-gray-50 lg:py-16 py-10 mx-auto max-w-screen-2xl px-3 sm:px-10"
+          >
+            <div className="mb-10 flex justify-center">
+              <div className="text-center w-full lg:w-2/5">
+                <h2 className="text-xl lg:text-2xl mb-2 font-serif font-semibold">
+                  Latest Discounted Products
+                </h2>
+                <p className="text-base font-sans text-gray-600 leading-6">
+                  See Our latest discounted products below. Choose your daily
+                  needs from here and get a special discount with free shipping.
+                </p>
+              </div>
+            </div>
+            <div className="flex">
+              <div className="w-full">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3 lg:gap-3">
+                  {discountProducts?.slice(0, 18).map((product) => (
+                    <ProductCard key={product._id} product={product} />
+                  ))}
                 </div>
               </div>
-            </>
-            
-          )    
-        }
-        
-      </div>
-
-      {/* promotional banner card */}
-      {/* <div className="block mx-auto max-w-screen-2xl">
-        <div className="mx-auto max-w-screen-2xl px-4 sm:px-10">
-          <div className="lg:p-16 p-6 bg-emerald-500 shadow-sm border rounded-lg">
-            <CardTwo />
-          </div>
-        </div>
-      </div> */}
-
-      {/* discounted products */}
-      {/* <div
-        id="discount"
-        className="bg-gray-50 lg:py-16 py-10 mx-auto max-w-screen-2xl px-3 sm:px-10"
-      >
-        <div className="mb-10 flex justify-center">
-          <div className="text-center w-full lg:w-2/5">
-            <h2 className="text-xl lg:text-2xl mb-2 font-serif font-semibold">
-              Latest Discounted Products
-            </h2>
-            <p className="text-base font-sans text-gray-600 leading-6">
-              See Our latest discounted products below. Choose your daily
-              needs from here and get a special discount with free shipping.
-            </p>
-          </div>
-        </div>
-        <div className="flex">
-          <div className="w-full">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3 lg:gap-3">
-              {discountProducts?.slice(0, 18).map((product) => (
-                <ProductCard key={product._id} product={product} />
-              ))}
             </div>
-          </div>
+          </div> */}
         </div>
-      </div> */}
-    </div>
-  </Layout>
-</>
-);
-};
+      </Layout>
+    </>
+    );
+}
 
 export const getServerSideProps = async ({req, res,params }) => {
-
+    //var coinPOSLiffData = params.id;
     var dataParam = params.id;
     var companyCode = params.name;
     var dataPath = companyCode + "/" + dataParam;
-    
+    var coinPOSData = req.url;
+    var targetPage = '';
+    if(coinPOSData.length > 0)
+    {
+      var parmsData = coinPOSData.split('?');
+      if(parmsData.length > 1)
+      {
+        //const liffQuery = parmsData[1];
+        var pageQuery = parmsData[1];
+        var pageQueryData = pageQuery.split("=");
+        if(pageQueryData[0] === 'page')
+        {
+          targetPage = pageQueryData[1];
+        
+        }
+      }
+    }
 
     var catalogName = dataParam;
     var companyName = '';
@@ -920,9 +1122,9 @@ export const getServerSideProps = async ({req, res,params }) => {
     const customerTypeId = 9;
     var page = 1;
     var itemPerPage = 30;
-    const query = null;
-    const category = null;
-    const product = null;   
+    const query = '';
+    const category = '';
+    const product = '';   
 
     const title = "all-in-one, heavy-duty & modern ecommerce platform";
     const description = "CoinPOS Ecommerce Platform - All-in-one, heavy-duty, cost-effective and modern ecommerce platform for business of all sizes.";
@@ -935,22 +1137,130 @@ export const getServerSideProps = async ({req, res,params }) => {
     var companyId = 0;
     var locationId = 0;
 
-    const products = await ProductServices.getDefaultDataCompany({
-        //const products = await ProductServices.getCoinPOSProductService({
-          liffId,
-          lineUserId,
-          linePOSId,
-          groupId,
-          orderId,
-          companyId,locationId,
-          companyName,
-          locationName,
-          catalogName,
-          companyCode,
-          promotionId,customerTypeId,page,itemPerPage,query,category,product
-        });
 
-        var promotions = [];
+    
+  const products = await ProductServices.fetchGetDefaultDataCompany({
+  //const products = await ProductServices.getCoinPOSProductService({
+    liffId,
+    lineUserId,
+    linePOSId,
+    groupId,
+    orderId,
+    companyId,locationId,
+    companyName,
+    locationName,
+    catalogName,
+    companyCode,
+    promotionId,customerTypeId,page,itemPerPage,query,category,product
+  });
+
+  /*var productVariants = [];//products.productVariantPresenters;
+  var productCategories = [];
+
+  if(products.productVariantPresenters !== null)
+  {
+    for(var i = 0;i < products.productVariantPresenters.length; i++)
+    {
+      var productItem = {};
+      productItem['_id'] = Number(products.productVariantPresenters[i].ProductVariantId);
+      productItem['title'] = products.productVariantPresenters[i].Name;
+      productItem['quantity'] = products.productVariantPresenters[i].StockLevel;
+      productItem['image'] = products.productVariantPresenters[i].ImageUrl;
+      productItem['unit'] = products.productVariantPresenters[i].UPC;
+      productItem['slug'] = products.productVariantPresenters[i].UPC;
+      productItem['originalPrice'] = products.productVariantPresenters[i].Price;
+      productItem['price'] = products.productVariantPresenters[i].Price;
+      productItem['type'] = 'W';
+      productItem['sku'] = products.productVariantPresenters[i].SKU;
+      productItem['discount'] = 0;
+      productItem['description'] = products.productVariantPresenters[i].Description;
+      productItem['currencySign'] = products.currencySign;
+      
+
+
+      productVariants.push(productItem);
+    }
+  }
+  
+
+  if(products.productCategoryPresenters !== null)
+  {
+    for(var j = 0;j < products.productCategoryPresenters.length; j++)
+    {
+
+      
+      var nests = [];
+      for(var k = 0;k < products.productCategoryPresenters[j].Products.length; k++)
+      {
+        var children = {};
+        children['_id'] = Number(products.productCategoryPresenters[j].Products[k].ProductId);
+        children['title'] = products.productCategoryPresenters[j].Products[k].Name;
+        nests.push(children);
+      }
+      
+
+      
+      var productCategory = {};
+      productCategory['_id'] = Number(products.productCategoryPresenters[j].CategoryId);
+      productCategory['parent'] = products.productCategoryPresenters[j].Name;
+      productCategory['icon'] = products.productCategoryPresenters[j].ImageUrl;
+      productCategory['children'] = nests;
+
+      productCategories.push(productCategory);
+
+
+    }
+  }*/
+  
+
+  /* for(var i = 0;i < products.productCategoryPresenters.length; i++)
+  {
+    var productItem = {};
+    productItem['_id'] = Number(products.productVariantPresenters[i].ProductVariantId);
+    productItem['title'] = products.productVariantPresenters[i].Name;
+    productItem['quantity'] = products.productVariantPresenters[i].StockLevel;
+    productItem['image'] = products.productVariantPresenters[i].ImageUrl;
+    productItem['unit'] = products.productVariantPresenters[i].UPC;
+    productItem['slug'] = products.productVariantPresenters[i].UPC;
+    productItem['originalPrice'] = products.productVariantPresenters[i].Price;
+    productItem['price'] = products.productVariantPresenters[i].Price;
+    productItem['type'] = '';
+    productItem['sku'] = products.productVariantPresenters[i].SKU;
+    productItem['discount'] = 0;
+    productItem['description'] = products.productVariantPresenters[i].Description;
+    productItem['currencySign'] = products.currencySign;
+    
+
+
+    productVariants.push(productItem);
+  } */
+  
+  /*var orderData = {};
+  var orderDetailDatas = [];
+   if(products.orderDetails !== null)
+  {
+    for(var i = 0;i < products.orderDetails.length; i++)
+    {
+      var orderDetailItem = {};
+      orderDetailItem['_id'] = products.orderDetails[i].orderDetailId;
+      orderDetailItem['upc'] = products.orderDetails[i].upc;
+      orderDetailItem['orderId'] = products.orderDetails[i].orderId;
+      orderDetailItem['productVariantId'] = products.orderDetails[i].productVariantId;
+      orderDetailItem['productVariantName'] = products.orderDetails[i].productVariantName;
+      orderDetailItem['sku'] = products.orderDetails[i].sku;
+      orderDetailItem['productVariantPrice'] = products.orderDetails[i].productVariantPrice;
+      orderDetailItem['locationId'] = products.orderDetails[i].locationId;
+      orderDetailItem['discount'] = products.orderDetails[i].discount;
+      orderDetailItem['quantity'] = products.orderDetails[i].quantity;
+      orderDetailItem['imageUrl'] = products.orderDetails[i].imageUrl;
+      orderDetailItem['lineOrder'] = products.orderDetails[i].lineOrder;
+
+      orderDetailDatas.push(orderDetailItem);
+
+    }
+  }*/
+
+  var promotions = [];
   promotions = products.promotions;
   var shippingServices = products.shippingServices;
   var bankNameAndAccounts = products.bankNameAndAccounts;
@@ -993,70 +1303,64 @@ export const getServerSideProps = async ({req, res,params }) => {
   
   companyName = products.companyName;
   locationName = products.locationName;
-  return {
-    props: { 
-      params: dataParam,
-      companyCode:companyCode,
-      dataPath:dataPath,
-      title:title,
-      description:description,
-      countPage:countPage,
-      currentPage:currentPage,
-      //products: productVariants,
-      //salesOrder:orderData,
-      //orderDetails:orderDetailDatas,
-      shippingServices:shippingServices,
-      bankNameAndAccounts:bankNameAndAccounts,
-      currencySign:currencySign,
-      companyName:companyName,
-      companyLogo:companyLogo,
-      companyFacebook:companyFacebook,
-      companyLine:companyLine,
-      catalogCompanyId:catalogCompanyId,
-      catalogName:catalogName,
-      catalogLocationId:catalogLocationId,
 
-      locationName:locationName,
-      //categories:productCategories,
-      customerFirstName:customerFirstName,
-      customerLastName:customerLastName,
-      customerEmail:customerEmail,
-      customerPhoneNumber:customerPhoneNumber,
 
-      address1:address1,
-      countryId:countryId,
-      provinceId:provinceId,
-      cityId:cityId,
-      districtId:districtId,
-      postalcode:postalcode,
-      countrys:countrys,
-      provinces:provinces,
-      cities:cities,
-      districts:districts,
+    return {
+      props: { 
+        params: dataParam,
+        targetPage:targetPage,
+        companyCode:companyCode,
+        dataPath:dataPath,
+        title:title,
+        description:description,
+        countPage:countPage,
+        currentPage:currentPage,
+        //products: productVariants,
+        //salesOrder:orderData,
+        //orderDetails:orderDetailDatas,
+        shippingServices:shippingServices,
+        bankNameAndAccounts:bankNameAndAccounts,
+        currencySign:currencySign,
+        companyName:companyName,
+        companyLogo:companyLogo,
+        companyFacebook:companyFacebook,
+        companyLine:companyLine,
+        catalogCompanyId:catalogCompanyId,
+        catalogName:catalogName,
+        catalogLocationId:catalogLocationId,
 
-      promotions:promotions,
+        locationName:locationName,
+        //categories:productCategories,
+        customerFirstName:customerFirstName,
+        customerLastName:customerLastName,
+        customerEmail:customerEmail,
+        customerPhoneNumber:customerPhoneNumber,
 
-      locationAddress1:locationAddress1,
-      locationAddress2:locationAddress2,
-      locationCity:locationCity,
-      locationStateOrProvince:locationStateOrProvince,
-      locationCountry:locationCountry,
-      locationPostalCode:locationPostalCode,
-      locationEmail:locationEmail,
-      locationTel:locationTel
+        address1:address1,
+        countryId:countryId,
+        provinceId:provinceId,
+        cityId:cityId,
+        districtId:districtId,
+        postalcode:postalcode,
+        countrys:countrys,
+        provinces:provinces,
+        cities:cities,
+        districts:districts,
 
-    },
+        promotions:promotions,
+
+        locationAddress1:locationAddress1,
+        locationAddress2:locationAddress2,
+        locationCity:locationCity,
+        locationStateOrProvince:locationStateOrProvince,
+        locationCountry:locationCountry,
+        locationPostalCode:locationPostalCode,
+        locationEmail:locationEmail,
+        locationTel:locationTel
+
+      },
+    };
   };
-};
 
-// export const getServerSideProps = async () => {
-//   const products = await ProductServices.getShowingProducts();
 
-//   return {
-//     props: {
-//       products,
-//     },
-//   };
-// };
-
-export default Home;
+export default Catalog;

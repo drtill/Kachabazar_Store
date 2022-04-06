@@ -65,10 +65,12 @@ p:not(:last-of-type) {
   border-width: 1px !important;
   width: 12px !important;
   height: 12px !important;
-  border-color: #059669 !important;
+  /*border-color: #059669 !important;*/
+  border-color: #0072C6 !important;
 }
 .react-multi-carousel-dot--active button {
-  background: #059669 !important;
+  /* background: #059669 !important; */
+  background: #0072C6 !important;
 }
 @media (min-width: 320px) and (max-width: 767px) {
   .react-multi-carousel-dot-list.custom-dot {

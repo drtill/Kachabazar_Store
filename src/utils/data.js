@@ -22,7 +22,6 @@ import {
   IoSettingsOutline,
 } from 'react-icons/io5';
 
-
 const pages = [
   // {
   //   title: 'User',
@@ -37,6 +36,11 @@ const pages = [
   {
     title: 'Checkout',
     href: '/checkout',
+    icon: IoBagCheckOutline,
+  },
+  {
+    title: 'Catalog',
+    href: '/catalog',
     icon: IoBagCheckOutline,
   },
   {

@@ -5,7 +5,7 @@ import Drawer from 'rc-drawer';
 import Category from '@component/category/Category';
 import { SidebarContext } from '@context/SidebarContext';
 
-const CategoryDrawer = () => {
+const CategoryDrawer = ({companyLogo,FilterProduct}) => {
   const { categoryDrawerOpen, closeCategoryDrawer } =
     useContext(SidebarContext);
 
@@ -17,7 +17,7 @@ const CategoryDrawer = () => {
       level={null}
       placement={'left'}
     >
-      <Category />
+      <Category companyLogo={companyLogo} FilterProduct={FilterProduct}/>
     </Drawer>
   );
 };

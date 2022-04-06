@@ -14,14 +14,15 @@ const InputPayment = ({ register, Icon, name, value, setShowCard }) => {
             </h6>
           </div>
           <input
-            onClick={() => setShowCard(value === 'Card' ? true : false)}
-            {...register('paymentMethod', {
+            onClick={() => setShowCard(
+              true)}
+            /* {...register('paymentMethod', {
               required: 'Payment Method is required!',
-            })}
+            })} */
             type="radio"
             value={value}
             name="paymentMethod"
-            className="form-radio outline-none focus:ring-0 text-emerald-500"
+            className="form-radio outline-none focus:ring-0 text-cyan-500"
           />
         </div>
       </label>

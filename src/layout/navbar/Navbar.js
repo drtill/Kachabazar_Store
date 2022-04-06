@@ -15,14 +15,14 @@ import LoginModal from '@component/modal/LoginModal';
 import CartDrawer from '@component/drawer/CartDrawer';
 import { SidebarContext } from '@context/SidebarContext';
 
-const Navbar = () => {
+const Navbar = ({companyLogo, dataPath, RefreshProductList, FilterProduct}) => {
   const [imageUrl, setImageUrl] = useState('');
   const [searchText, setSearchText] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const { toggleCartDrawer } = useContext(SidebarContext);
   const { totalItems } = useCart();
   const router = useRouter();
-
+  
   const {
     state: { userInfo },
   } = useContext(UserContext);
@@ -30,20 +30,44 @@ const Navbar = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (searchText) {
-      router.push(`/search?query=${searchText}`, null, { scroll: false });
+      RefreshProductList(searchText);
+      //router.push(`/search?query=${searchText}`, null, { scroll: false });
       setSearchText('');
     } else {
-      router.push(`/ `, null, { scroll: false });
+      RefreshProductList('');
+      //router.push(`/ `, null, { scroll: false });
       setSearchText('');
     }
   };
 
+  
   useEffect(() => {
-    if (Cookies.get('userInfo')) {
-      const user = JSON.parse(Cookies.get('userInfo'));
-      setImageUrl(user.image);
-    }
-  }, []);
+      //alert("Check UserInfo")
+      if(Cookies.get('userInfo'))
+      {
+        Cookies.remove('userInfo');
+      } 
+      var userLocalJson = localStorage.getItem('userInfo');
+      if(userLocalJson === null)
+      {
+
+      }
+      else
+      {
+        Cookies.set('userInfo', userLocalJson);
+        var userLocal = JSON.parse(userLocalJson)
+        //alert("User Info " + JSON.stringify(userInfo));
+        if (Cookies.get('userInfo')) {
+          //alert(JSON.stringify(Cookies.get('userInfo')));
+          const user = JSON.parse(Cookies.get('userInfo'));
+          //alert("Cookie = " + JSON.stringify(user));
+          setImageUrl(user.image);
+        }
+      }
+      
+  });
+
+  
 
   return (
     <>
@@ -52,19 +76,27 @@ const Navbar = () => {
         <LoginModal modalOpen={modalOpen} setModalOpen={setModalOpen} />
       )}
 
-      <div className="bg-emerald-500 sticky top-0 z-20">
+      <div className="bg-cyan-500 sticky top-0 z-20">
         <div className="max-w-screen-2xl mx-auto px-3 sm:px-10">
           <div className="top-bar h-16 lg:h-auto flex items-center justify-between py-4 mx-auto">
-            <Link href="/">
-              <a className="mr-3 lg:mr-12 xl:mr-12 hidden md:hidden lg:block">
-                <Image
-                  width={110}
-                  height={40}
-                  src="/logo/logo-light.svg"
-                  alt="logo"
-                />
-              </a>
-            </Link>
+            {
+              (companyLogo === undefined || companyLogo === null || companyLogo.length === 0)
+              ?
+              <></>
+              :
+              <Link href={"/" + dataPath}>
+                <a className="mr-3 lg:mr-12 xl:mr-12 hidden md:hidden lg:block">
+                  <Image
+                    width={70}
+                    height={70}
+                    src={companyLogo === undefined ? 'https://coinpos-uat.azurewebsites.net/img/logo2.png' : companyLogo}
+                    alt="logo"
+                  />
+                </a>
+              </Link>
+              
+            }
+            
             <div className="w-full transition-all duration-200 ease-in-out lg:flex lg:max-w-[520px] xl:max-w-[750px] 2xl:max-w-[900px] md:mx-12 lg:mx-4 xl:mx-0">
               <div className="w-full flex flex-col justify-center flex-shrink-0 relative z-30">
                 <div className="flex flex-col mx-auto w-full">
@@ -77,7 +109,7 @@ const Navbar = () => {
                         onChange={(e) => setSearchText(e.target.value)}
                         value={searchText}
                         className="form-input w-full pl-5 appearance-none transition ease-in-out border text-input text-sm font-sans rounded-md min-h-10 h-10 duration-200 bg-white focus:ring-0 outline-none border-none focus:outline-none placeholder-gray-500 placeholder-opacity-75"
-                        placeholder="Search for products (e.g. fish, apple, oil)"
+                        placeholder="ระบุคำค้นหาสินค้า (เช่น ชื่อ, บาร์โค้ด)"
                       />
                     </label>
                     <button
@@ -96,7 +128,7 @@ const Navbar = () => {
                 className="pr-5 text-white text-2xl font-bold"
                 aria-label="Alert"
               >
-                <FiBell className="w-6 h-6 drop-shadow-xl" />
+                {/* <FiBell className="w-6 h-6 drop-shadow-xl" /> */}
               </button>
               <button
                 aria-label="Total"
@@ -143,7 +175,7 @@ const Navbar = () => {
         </div>
 
         {/* second header */}
-        <NavbarPromo />
+        <NavbarPromo FilterProduct={FilterProduct}/>
       </div>
     </>
   );

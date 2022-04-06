@@ -51,7 +51,7 @@ const ProductScreen = ({ product, relatedProduct }) => {
                 <FiChevronRight />{' '}
               </li>
               <li className="text-sm pl-1 transition duration-200 ease-in cursor-pointer hover:text-emerald-500 font-semibold ">
-                <Link
+                {/* <Link
                   href={`/search?category=${product.children
                     .toLowerCase()
                     .replace('&', '')
@@ -59,7 +59,7 @@ const ProductScreen = ({ product, relatedProduct }) => {
                     .join('-')}`}
                 >
                   <a>{product.children}</a>
-                </Link>
+                </Link> */}
               </li>
               <li className="text-sm mt-[1px]">
                 {' '}

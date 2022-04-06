@@ -1,6 +1,17 @@
-import React from 'react';
+import React,{useState, useEffect} from 'react';
 import Image from 'next/image';
 import { useForm } from 'react-hook-form';
+import {
+  // FiUser,
+  FiGift,
+  FiAlertCircle,
+  FiHelpCircle,
+  FiTruck,
+  FiPhoneCall,
+  FiCreditCard,
+  FiMail,
+  FiMapPin,
+} from 'react-icons/fi';
 
 //internal import
 import Layout from '@layout/Layout';
@@ -24,15 +35,180 @@ const ContactUs = () => {
     );
   };
 
+  var companyLogoData = '';
+  var companyNameData = '';
+  var locationNameData = '';
+  var locationAddress1Data = '';
+  var locationAddress2Data = '';
+  var locationCityData = '';
+  var locationStateOrProvinceData = '';
+  var locationCountryData = '';
+  var locationPostalCodeData = '';
+  var locationEmailData = '';
+  var locationTelData = '';
+
+  const [companyId, setCompanyId] = useState(0);
+  const [locationId, setLocationId] = useState(0);
+  const [linePOSId, setLinePOSId] = useState('');
+  const [lineUserId, setLineUserId] = useState('');
+  const [groupId, setGroupId] = useState('');
+  const [liffId, setLiffId] = useState('');
+  const [pictureUrl, setPictureUrl] = useState('');
+
+  useEffect(() => 
+  {
+    if(sessionStorage.getItem('companyLogo'))
+    {
+      companyLogoData = sessionStorage.getItem('companyLogo'); 
+      //alert(companyLogo)
+    }
+    if(sessionStorage.getItem('companyName'))
+    {
+      
+      companyNameData = sessionStorage.getItem('companyName'); 
+      //alert(companyName);
+    }
+    if(sessionStorage.getItem('locationName'))
+    {
+      locationNameData = sessionStorage.getItem('locationName'); 
+      
+    }
+    if(sessionStorage.getItem('locationAddress1'))
+    {
+      locationAddress1Data = sessionStorage.getItem('locationAddress1'); 
+      
+    }
+    if(sessionStorage.getItem('locationAddress2'))
+    {
+      locationAddress2Data = sessionStorage.getItem('locationAddress2'); 
+      
+    }
+    if(sessionStorage.getItem('locationCity'))
+    {
+      locationCityData = sessionStorage.getItem('locationCity'); 
+      
+    }
+    if(sessionStorage.getItem('locationStateOrProvince'))
+    {
+      locationStateOrProvinceData = sessionStorage.getItem('locationStateOrProvince'); 
+      
+    }
+    if(sessionStorage.getItem('locationCountry'))
+    {
+      locationCountryData = sessionStorage.getItem('locationCountry'); 
+      
+    }
+    if(sessionStorage.getItem('locationPostalCode'))
+    {
+      locationPostalCodeData = sessionStorage.getItem('locationPostalCode'); 
+      
+    }
+    if(sessionStorage.getItem('locationEmail'))
+    {
+      locationEmailData = sessionStorage.getItem('locationEmail'); 
+      
+    }
+    if(sessionStorage.getItem('locationTel'))
+    {
+      locationTelData = sessionStorage.getItem('locationTel'); 
+      
+    }
+        if(sessionStorage.getItem('liffId'))
+        {
+          
+          liffId = sessionStorage.getItem('liffId'); 
+          //alert("Liff id = " + liffId)
+        }
+        if(sessionStorage.getItem('linePOSId'))
+        {
+          linePOSId = sessionStorage.getItem('linePOSId'); 
+          //alert("LinePOS id = " + linePOSId)
+        }
+        if(sessionStorage.getItem('lineUserId'))
+        {
+          lineUserId = sessionStorage.getItem('lineUserId'); 
+          
+        }
+        if(sessionStorage.getItem('companyId'))
+        {
+          companyId = sessionStorage.getItem('companyId'); 
+          
+        }
+        if(sessionStorage.getItem('locationId'))
+        {
+          locationId = sessionStorage.getItem('locationId'); 
+          
+        }
+        if(sessionStorage.getItem('groupId'))
+        {
+          groupId = sessionStorage.getItem('groupId'); 
+          
+        }
+
+  });
+  
+
+  const [companyLogo,setCompanyLogo] = useState(companyLogoData);
+  const [companyName,setCompanyName] = useState(companyNameData);
+  const [locationName,setLocationName] = useState(locationNameData);
+  const [locationEmail,setLocationEmail] = useState(locationEmailData);
+  const [locationTel,setLocationTel] = useState(locationTelData);
+  const [locationAddress1,setLocationAddress1] = useState(locationAddress1Data);
+  const [locationAddress2,setLocationAddress2] = useState(locationAddress2Data);
+  const [locationCity,setLocationCity] = useState(locationCityData);
+  const [locationStateOrProvince,setLocationStateOrProvince] = useState(locationStateOrProvinceData);
+  const [locationCountry,setLocationCountry] = useState(locationCountryData);
+  const [locationPostalCode,setLocationPostalCode] = useState(locationPostalCodeData);
+
+
+  useEffect(() => 
+  {
+
+
+  });
+
+      const locationContactData = [
+        {
+          id: 1,
+          title: 'Email Us',
+          info: 'Interactively grow empowered for process-centric total linkage.',
+          icon: FiMail,
+          contact: locationEmail,
+          className: 'bg-emerald-100',
+        },
+        {
+          id: 2,
+          title: 'Call Us',
+          info: 'Distinctively disseminate focused solutions clicks-and-mortar ministate.',
+          icon: FiPhoneCall,
+          contact: locationTel,
+          className: 'bg-yellow-100',
+        },
+        {
+          id: 3,
+          title: 'Location',
+          info: locationAddress1 + " " + locationAddress2 + " " + locationCity + " " + " " + locationStateOrProvince + " " + locationCountry + " " + locationPostalCode,
+          icon: FiMapPin,
+          contact: '',
+          className: 'bg-indigo-100',
+        },
+      ];
+
+    
+
   return (
-    <Layout title="Contact Us" description="This is contact us page">
+    <Layout title="Contact Us" description="This is contact us page"
+    companyName={companyName} locationName={locationName} companyLogo={companyLogoData}  
+      locationAddress1={locationAddress1} locationAddress2={locationAddress2} locationCity={locationCity}
+      locationStateOrProvince={locationStateOrProvince} locationCountry={locationCountry} locationPostalCode={locationPostalCode}
+      locationEmail={locationEmail} locationTel={locationTel}>
       <PageHeader title="Contact Us" />
 
       <div className="bg-white">
         <div className="max-w-screen-2xl mx-auto lg:py-20 py-10 px-4 sm:px-10">
           {/* contact promo */}
           <div className="grid md:grid-cols-2 gap-6 lg:grid-cols-3 xl:gap-8 font-serif">
-            {contactData.map((data) => (
+            {locationContactData.map((data) => (
               <div key={data.id} className="border p-10 rounded-lg text-center">
                 <span className="flex justify-center text-4xl text-emerald-500 mb-4">
                   <data.icon />
@@ -52,7 +228,7 @@ const ContactUs = () => {
           </div>
 
           {/* contact form */}
-          <div className="px-0 pt-24 mx-auto items-center flex flex-col md:flex-row w-full justify-between">
+          {/* <div className="px-0 pt-24 mx-auto items-center flex flex-col md:flex-row w-full justify-between">
             <div className="hidden md:w-full lg:w-5/12 lg:flex flex-col h-full">
               <Image
                 width={874}
@@ -137,7 +313,7 @@ const ContactUs = () => {
                 </div>
               </form>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </Layout>

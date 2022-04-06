@@ -5,6 +5,38 @@ import { FiPlus, FiMinus } from 'react-icons/fi';
 const CheckoutCard = ({ item }) => {
   const { updateItemQuantity } = useCart();
 
+  const handleRemoveItem = async(item) => {
+    removeItem(item.id)
+
+    removeCoinPOSCartDetail(item,liffId,linePOSId,orderId,pictureUrl);
+  };
+
+  const handleDecrease = async(_id, _qty) => {
+
+    
+
+    updateItemQuantity(_id, _qty)
+    var _updateType = 'Dec';
+    if(_qty == 0)
+    {
+      removeCoinPOSCartDetail(item,liffId,linePOSId,orderId,pictureUrl);
+    }
+    else
+    {
+      updateCoinPOSCartDetail(item, _qty,liffId, lineUserId, linePOSId, groupId, orderId, companyId, locationId, pictureUrl, _updateType)
+    }
+    
+  };
+
+  const handleIncrease = async(_id, _qty) => {
+
+    
+    
+    updateItemQuantity(_id, _qty)
+    var _updateType = 'Inc';
+    updateCoinPOSCartDetail(item, _qty,liffId, lineUserId, linePOSId, groupId, orderId, companyId, locationId, pictureUrl, _updateType)
+  };
+  
   return (
     <div
       key={item.id}

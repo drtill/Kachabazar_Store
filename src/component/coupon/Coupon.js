@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import dayjs from 'dayjs';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -6,33 +6,108 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 //internal import
 import useAsync from '@hooks/useAsync';
 import CouponServices from '@services/CouponServices';
+import ProductServices from '@services/ProductServices';
 import OfferTimer from '@component/coupon/OfferTimer';
 
-const Coupon = ({ couponInHome }) => {
+const Coupon = ({ couponInHome, companyId, promotions, catalogName, ApplyPromotionCode, CancelPromotionCode }) => {
   const [copiedCode, setCopiedCode] = useState('');
   const [copied, setCopied] = useState(false);
 
-  const { data, error } = useAsync(CouponServices.getAllCoupons);
+  useEffect(() => 
+  {
+    //alert("selectedPromotion = " + selectedPromotion);
+    //if(selectedPromotion !== undefined)
+    //{
 
-  const handleCopied = (code) => {
-    setCopiedCode(code);
-    setCopied(true);
+      //setCopiedCode(selectedPromotion);
+    //  setCopied(true);
+    //}
+    if(sessionStorage.getItem('promotionCode'))
+    {
+      var promotionCode = sessionStorage.getItem('promotionCode'); 
+          
+          //alert("discountDetailsJson = " + discountDetailsJson);
+          setCopiedCode(promotionCode);
+          setCopied(true);
+          
+    }
+    else
+    {
+      setCopiedCode("");
+      setCopied(false);
+    }
+  });
+  
+  //alert("promotions = " + JSON.stringify(promotions));
+  //const { data, error } = useAsync(() => ProductServices.getAllCoinPOSCoupons({companyId}))//useAsync(ProductServices.getAllCoinPOSCoupons({companyId}));
+  //const { data, error } = useAsync(CouponServices.getAllCoupons)
+  //const promotionDatas = promotions;
+  const handleCopied = (code,discountPercentage,isForAllProduct, minimumAmount, productIdList) => {
+    //setCopiedCode(code);
+    //setCopied(true);
+
+    var promotionCode = '';
+    if(sessionStorage.getItem('promotionCode'))
+    {
+      promotionCode = sessionStorage.getItem('promotionCode'); 
+          
+          //alert("discountDetailsJson = " + discountDetailsJson);
+          //setCopiedCode(promotionCode);
+          //setCopied(true);
+          
+    }
+    if(promotionCode === code)
+    {
+      //alert("ยกเลิก")
+      setCopiedCode("");
+      setCopied(false);
+
+      CancelPromotionCode(code);
+    }
+    else
+    {
+      //alert("minimumAmount = " + minimumAmount)
+    //alert("productIdList = " + productIdList)
+    
+
+      setCopiedCode(code);
+      setCopied(true);
+      ApplyPromotionCode(code,discountPercentage,isForAllProduct, minimumAmount, productIdList);
+    }
+    //if(catalogName !== undefined)
+    //{
+    //  setCopiedCode(code);
+    //  setCopied(true);
+    //}
+    //else
+    //{
+      
+    //}
+    
   };
+  const error = '';
 
   return (
     <>
-      {error ? (
+      {error 
+      ? 
+      (
         <p className="flex justify-center align-middle items-center m-auto text-xl text-red-500">
           <span> {error}</span>
         </p>
-      ) : couponInHome ? (
-        data?.slice(0, 2).map((coupon) => (
+      ) 
+      : 
+      couponInHome 
+      ? 
+      (
+        
+        promotions?.slice(0, 2).map((coupon) => (
           <div
             key={coupon._id}
             className="coupon coupon-home mx-4 my-5 block md:flex lg:flex md:justify-between lg:justify-between items-center bg-white rounded-md shadow"
           >
             <div className="tengah py-2 px-3 flex items-center justify-items-start">
-              <figure>
+              {/* <figure>
                 <Image
                   src={coupon.logo}
                   alt={coupon.title}
@@ -40,7 +115,7 @@ const Coupon = ({ couponInHome }) => {
                   height={100}
                   className="rounded-lg"
                 />
-              </figure>
+              </figure> */}
               <div className="ml-3">
                 <div className="flex items-center font-serif">
                   <h6 className="pl-1 text-base font-medium text-gray-600">
@@ -55,7 +130,7 @@ const Coupon = ({ couponInHome }) => {
                         Inactive
                       </span>
                     ) : (
-                      <span className="text-emerald-600 inline-block px-4 py-1 rounded-full font-medium text-xs bg-emerald-100">
+                      <span className="text-cyan-600 inline-block px-4 py-1 rounded-full font-medium text-xs bg-cyan-100">
                         Active
                       </span>
                     )}
@@ -64,6 +139,7 @@ const Coupon = ({ couponInHome }) => {
                 <h2 className="pl-1 font-serif text-base text-gray-700 leading-6 font-semibold mb-2">
                   {coupon.title}
                 </h2>
+                
                 {dayjs().isAfter(dayjs(coupon.endTime)) ? (
                   <span className="inline-block mb-2">
                     <div className="flex items-center font-semibold">
@@ -100,18 +176,18 @@ const Coupon = ({ couponInHome }) => {
               <div className="info flex items-center">
                 <div className="w-full">
                   <div className="block">
-                    <div className="font-serif border border-dashed bg-emerald-50 py-1 border-emerald-300 rounded-lg text-center block">
+                    <div className="font-serif border border-dashed bg-cyan-50 py-1 border-cyan-300 rounded-lg text-center block">
                       <CopyToClipboard
                         text={coupon.couponCode}
-                        onCopy={() => handleCopied(coupon.couponCode)}
+                        onCopy={() => handleCopied(coupon.couponCode,coupon.discountPercentage,coupon.isForAllProduct,coupon.minimumAmount,coupon.productPromotion)}
                       >
                         <button className="block w-full">
                           {copied && coupon.couponCode === copiedCode ? (
-                            <span className="text-emerald-600 text-sm leading-7 font-semibold">
-                              Copied!
+                            <span className="text-cyan-600 text-sm leading-7 font-semibold">
+                              ยกเลิก ส่วนลด!
                             </span>
                           ) : (
-                            <span className="uppercase font-serif font-semibold text-sm leading-7 text-emerald-600">
+                            <span className="uppercase font-serif font-semibold text-sm leading-7 text-cyan-600">
                               {coupon.couponCode}{' '}
                             </span>
                           )}
@@ -119,17 +195,43 @@ const Coupon = ({ couponInHome }) => {
                       </CopyToClipboard>
                     </div>
                   </div>
+                  
                   <p className="text-xs leading-4 text-gray-500 mt-2">
-                    * This coupon apply when shopping more then{' '}
-                    <span className="font-bold"> ${coupon.minimumAmount}</span>{' '}
+                    กดรหัสด้านบน เพื่อใช้ส่วนลด
                   </p>
+                  
+                  {
+                    coupon.productType !== null ?
+                      <>
+                        <p className="text-xs leading-5 text-gray-500 mt-2">
+                          * คูปองนี้ใช้ได้กับ{' '}
+                          <span className="font-bold text-gray-700">
+                            สินค้า ประเภท {coupon.productType}
+                          </span>{' '}
+                          และ เมื่อยอดมากกว่า{' '}
+                          <span className="font-bold text-gray-700">
+                            {coupon.currencySign}{coupon.minimumAmount}
+                          </span>{' '}
+                        </p>
+                      </>
+                    :
+                      <>
+                        <p className="text-xs leading-4 text-gray-500 mt-2">
+                        * คูปองนี้ใช้ได้เมื่อยอดมากกว่า{' '}
+                        <span className="font-bold"> {coupon.currencySign}{coupon.minimumAmount}</span>{' '}
+                      </p>
+                      </>
+                  }
+                  
                 </div>
               </div>
             </div>
           </div>
         ))
-      ) : (
-        data?.map((coupon) => (
+      )
+      : 
+      (
+        promotions?.map((coupon) => (
           <div
             key={coupon._id}
             className="coupon block md:flex lg:flex md:justify-between lg:justify-between items-center bg-white rounded-md shadow-sm"
@@ -196,25 +298,25 @@ const Coupon = ({ couponInHome }) => {
                             Inactive
                           </span>
                         ) : (
-                          <span className="text-emerald-600 inline-block">
+                          <span className="text-cyan-600 inline-block">
                             Active
                           </span>
                         )}
                       </div>
                     </div>
 
-                    <div className="font-serif border border-dashed bg-emerald-50 py-2 border-emerald-300 rounded-lg text-center block">
+                    <div className="font-serif border border-dashed bg-cyan-50 py-2 border-cyan-300 rounded-lg text-center block">
                       <CopyToClipboard
                         text={coupon.couponCode}
                         onCopy={() => handleCopied(coupon.couponCode)}
                       >
                         <button className="block w-full">
                           {copied && coupon.couponCode === copiedCode ? (
-                            <span className="text-emerald-600 text-base leading-7 font-semibold">
-                              Copied!
+                            <span className="text-cyan-600 text-base leading-7 font-semibold">
+                              คูปอง กำลังถูกใช้!
                             </span>
                           ) : (
-                            <span className="uppercase font-serif font-semibold text-base leading-7 text-emerald-600">
+                            <span className="uppercase font-serif font-semibold text-base leading-7 text-cyan-600">
                               {coupon.couponCode}{' '}
                             </span>
                           )}
@@ -229,7 +331,7 @@ const Coupon = ({ couponInHome }) => {
                     </span>{' '}
                     and when you shopping more then{' '}
                     <span className="font-bold text-gray-700">
-                      ${coupon.minimumAmount}
+                      {coupon.currencySign}{coupon.minimumAmount}
                     </span>{' '}
                   </p>
                 </div>
@@ -237,7 +339,8 @@ const Coupon = ({ couponInHome }) => {
             </div>
           </div>
         ))
-      )}
+      )
+      }
     </>
   );
 };

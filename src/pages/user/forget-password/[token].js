@@ -29,9 +29,11 @@ const ForgetPassword = () => {
   password.current = watch('newPassword');
 
   const submitHandler = ({ registerEmail, password, newPassword }) => {
+    
     setLoading(true);
     if (newPassword) {
-      UserServices.resetPassword({ newPassword, token: router.query?.token })
+      alert("submit Reset = " + router.query?.token)
+      UserServices.resetCoinPOSCustomerPassword({ newPassword, token: router.query?.token })
         .then((res) => {
           setLoading(false);
           setShowLogin(true);
@@ -45,7 +47,58 @@ const ForgetPassword = () => {
     }
 
     if (registerEmail && password) {
-      UserServices.userLogin({
+
+      alert("Login");
+      var companyId = 0;
+      alert("Login 2 ");
+      if(sessionStorage.getItem('companyId'))
+      {
+        alert("Get CompanyId");
+        companyId = sessionStorage.getItem('companyId'); 
+        alert("CompanyId = " + companyId);
+          
+      }
+
+      UserServices.coinposUserLogin({
+        registerEmail,
+        password,
+        companyId
+      })
+        .then((res) => {
+          setLoading(false);
+          setModalOpen(false);
+          alert(JSON.stringify(res));
+          //return;
+          router.push(redirect || '/checkout');
+          //router.push(redirect);
+
+          sessionStorage.setItem('customerFirstName', res.firstName);
+          sessionStorage.setItem('customerLastName', res.lastName);
+          sessionStorage.setItem('customerEmail', res.email);
+          sessionStorage.setItem('customerPhoneNumber', res.phone);
+
+          sessionStorage.setItem('address1', res.address1);
+          sessionStorage.setItem('countryId', res.countryId);
+          sessionStorage.setItem('provinceId', res.provinceId);
+          sessionStorage.setItem('cityId', res.cityId);
+          sessionStorage.setItem('districtId', res.districtId);
+          sessionStorage.setItem('postalcode', res.postalcode);
+
+          sessionStorage.setItem('countrys', JSON.stringify(res.countrys));
+          sessionStorage.setItem('provinces', JSON.stringify(res.provinces));
+          sessionStorage.setItem('cities', JSON.stringify(res.cities));
+          sessionStorage.setItem('districts', JSON.stringify(res.districts));
+
+
+          notifySuccess('Login Success!');
+          dispatch({ type: 'USER_LOGIN', payload: res });
+          Cookies.set('userInfo', JSON.stringify(res));
+        })
+        .catch((err) => {
+          notifyError(err ? err.response.data.message : err.message);
+          setLoading(false);
+        });
+      /*UserServices.userLogin({
         registerEmail,
         password,
       })
@@ -59,7 +112,7 @@ const ForgetPassword = () => {
         .catch((err) => {
           setLoading(false);
           notifyError(err ? err.response.data.message : err.message);
-        });
+        });*/
     }
   };
 

@@ -8,7 +8,7 @@ const OfferTimer = ({ expiryTimestamp, darkGreen }) => {
     <>
       <span
         className={`flex items-center justify-center ${
-          darkGreen ? 'bg-emerald-500 text-white' : 'bg-emerald-100'
+          darkGreen ? 'bg-cyan-500 text-white' : 'bg-emerald-100'
         }  text-sm font-serif font-semibold px-2 py-1 rounded mx-1`}
       >
         {days}
@@ -16,7 +16,7 @@ const OfferTimer = ({ expiryTimestamp, darkGreen }) => {
       :
       <span
         className={`flex items-center justify-center ${
-          darkGreen ? 'bg-emerald-500 text-white' : 'bg-emerald-100'
+          darkGreen ? 'bg-cyan-500 text-white' : 'bg-emerald-100'
         }  text-sm font-serif font-semibold px-2 py-1 rounded mx-1`}
       >
         {hours}
@@ -24,7 +24,7 @@ const OfferTimer = ({ expiryTimestamp, darkGreen }) => {
       :
       <span
         className={`flex items-center justify-center ${
-          darkGreen ? 'bg-emerald-500 text-white' : 'bg-emerald-100'
+          darkGreen ? 'bg-cyan-500 text-white' : 'bg-emerald-100'
         }  text-sm font-serif font-semibold px-2 py-1 rounded mx-1`}
       >
         {minutes}
@@ -32,7 +32,7 @@ const OfferTimer = ({ expiryTimestamp, darkGreen }) => {
       :
       <span
         className={`flex items-center justify-center ${
-          darkGreen ? 'bg-emerald-500 text-white' : 'bg-emerald-100'
+          darkGreen ? 'bg-cyan-500 text-white' : 'bg-emerald-100'
         }  text-sm font-serif font-semibold px-2 py-1 rounded mx-1`}
       >
         {seconds}

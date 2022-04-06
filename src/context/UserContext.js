@@ -4,8 +4,11 @@ import React, { createContext, useReducer } from 'react';
 export const UserContext = createContext();
 
 const initialState = {
+  
   userInfo: Cookies.get('userInfo')
-    ? JSON.parse(Cookies.get('userInfo'))
+    ? 
+      JSON.parse(Cookies.get('userInfo'))
+      
     : null,
   shippingAddress: Cookies.get('shippingAddress')
     ? JSON.parse(Cookies.get('shippingAddress'))
@@ -16,6 +19,7 @@ const initialState = {
 };
 
 function reducer(state, action) {
+  //alert(action.type);
   switch (action.type) {
     case 'USER_LOGIN':
       return { ...state, userInfo: action.payload };

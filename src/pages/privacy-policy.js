@@ -1,12 +1,128 @@
-import React from 'react';
+import React,{useState, useEffect} from 'react';
 
 //internal import
 import Layout from '@layout/Layout';
 import PageHeader from '@component/header/PageHeader';
 
 const PrivacyPolicy = () => {
+  var companyLogo = '';
+  var companyName = '';
+  var locationName = '';
+  var locationAddress1 = '';
+  var locationAddress2 = '';
+  var locationCity = '';
+  var locationStateOrProvince = '';
+  var locationCountry = '';
+  var locationPostalCode = '';
+  var locationEmail = '';
+  var locationTel = '';
+
+  const [companyId, setCompanyId] = useState(0);
+  const [locationId, setLocationId] = useState(0);
+  const [linePOSId, setLinePOSId] = useState('');
+  const [lineUserId, setLineUserId] = useState('');
+  const [groupId, setGroupId] = useState('');
+  const [liffId, setLiffId] = useState('');
+  const [pictureUrl, setPictureUrl] = useState('');
+
+  useEffect(() => 
+  {
+    if(sessionStorage.getItem('companyLogo'))
+    {
+      companyLogo = sessionStorage.getItem('companyLogo'); 
+      
+    }
+    if(sessionStorage.getItem('companyName'))
+    {
+      
+      companyName = sessionStorage.getItem('companyName'); 
+      //alert(companyName);
+    }
+    if(sessionStorage.getItem('locationName'))
+    {
+      locationName = sessionStorage.getItem('locationName'); 
+      
+    }
+    if(sessionStorage.getItem('locationAddress1'))
+    {
+      locationAddress1 = sessionStorage.getItem('locationAddress1'); 
+      
+    }
+    if(sessionStorage.getItem('locationAddress2'))
+    {
+      locationAddress2 = sessionStorage.getItem('locationAddress2'); 
+      
+    }
+    if(sessionStorage.getItem('locationCity'))
+    {
+      locationCity = sessionStorage.getItem('locationCity'); 
+      
+    }
+    if(sessionStorage.getItem('locationStateOrProvince'))
+    {
+      locationStateOrProvince = sessionStorage.getItem('locationStateOrProvince'); 
+      
+    }
+    if(sessionStorage.getItem('locationCountry'))
+    {
+      locationCountry = sessionStorage.getItem('locationCountry'); 
+      
+    }
+    if(sessionStorage.getItem('locationPostalCode'))
+    {
+      locationPostalCode = sessionStorage.getItem('locationPostalCode'); 
+      
+    }
+    if(sessionStorage.getItem('locationEmail'))
+    {
+      locationEmail = sessionStorage.getItem('locationEmail'); 
+      
+    }
+    if(sessionStorage.getItem('locationTel'))
+    {
+      locationTel = sessionStorage.getItem('locationTel'); 
+      
+    }
+        if(sessionStorage.getItem('liffId'))
+        {
+          
+          liffId = sessionStorage.getItem('liffId'); 
+          //alert("Liff id = " + liffId)
+        }
+        if(sessionStorage.getItem('linePOSId'))
+        {
+          linePOSId = sessionStorage.getItem('linePOSId'); 
+          //alert("LinePOS id = " + linePOSId)
+        }
+        if(sessionStorage.getItem('lineUserId'))
+        {
+          lineUserId = sessionStorage.getItem('lineUserId'); 
+          
+        }
+        if(sessionStorage.getItem('companyId'))
+        {
+          companyId = sessionStorage.getItem('companyId'); 
+          
+        }
+        if(sessionStorage.getItem('locationId'))
+        {
+          locationId = sessionStorage.getItem('locationId'); 
+          
+        }
+        if(sessionStorage.getItem('groupId'))
+        {
+          groupId = sessionStorage.getItem('groupId'); 
+          
+        }
+
+  });
+  
   return (
-    <Layout title="Privacy Policy" description="This is privacy policy page">
+    <Layout title="Privacy Policy" description="This is privacy policy page"
+    companyName={companyName} locationName={locationName} companyLogo={companyLogo}  
+      locationAddress1={locationAddress1} locationAddress2={locationAddress2} locationCity={locationCity}
+      locationStateOrProvince={locationStateOrProvince} locationCountry={locationCountry} locationPostalCode={locationPostalCode}
+      locationEmail={locationEmail} locationTel={locationTel}>
       <PageHeader title="Privacy Policy" />
       <div className="bg-white">
         <div className="max-w-screen-2xl mx-auto lg:py-20 py-10 px-4 sm:px-10">
