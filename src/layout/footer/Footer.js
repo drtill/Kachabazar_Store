@@ -37,6 +37,8 @@ const Footer = ({companyLogo,dataPath, companyName, locationName, locationAddres
     companyLine = sessionStorage.getItem('companyLine'); 
   }
 
+
+
   return (
     <div className="pb-16 lg:pb-0 xl:pb-0 bg-white">
       <div className="mx-auto max-w-screen-2xl px-4 sm:px-10">
@@ -112,6 +114,7 @@ const Footer = ({companyLogo,dataPath, companyName, locationName, locationAddres
                 <Link
                   /* href={`${userInfo?.email ? '/user/update-profile' : '#'}`} */
                   href='/user/update-profile'
+                  //onClick={() => handleUpdate}
                 >
                   <a className="text-gray-600 inline-block w-full hover:text-cyan-500">
                     Updated Profile

@@ -3,8 +3,8 @@ import requests from './httpServices';
 
 const { signInToken, tokenForVerify, sendEmail } = require('../config/auth');
 
-//const serviceUrl = 'https://coinpos-uat.azurewebsites.net/lineliff/';
-const serviceUrl = 'http://localhost:41781/lineliff/';
+const serviceUrl = 'https://coinpos-uat.azurewebsites.net/lineliff/';
+//const serviceUrl = 'http://localhost:41781/lineliff/';
 const UserServices = {
   userLogin(body) {
     return requests.post('/user/login', body);
