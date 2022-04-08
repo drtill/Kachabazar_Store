@@ -1191,7 +1191,7 @@ export const getServerSideProps = async ({req, res,params }) => {
   
   var dataPath = 'liffId=' + liffId + '?linePOSId=' + linePOSId + '&groupId=' + groupId + '&orderId=' + liffOrderId + '&companyId=' + liffCompanyId + '&locationId=' + liffLocationId;
   
-  var liffEndpoint = await  ProductServices.fetchGetLiffURLTemplate();
+  var liffEndpoint = await  UserServices.fetchGetLiffURLTemplate();
 
   var catalogName = '';
   var companyCode = '';

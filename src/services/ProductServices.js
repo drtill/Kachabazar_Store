@@ -1,7 +1,7 @@
 import requests from './httpServices';
 
-const serviceUrl = 'https://coinpos-uat.azurewebsites.net/lineliff/';
-//const serviceUrl = 'http://localhost:41781/lineliff/';
+//const serviceUrl = 'https://coinpos-uat.azurewebsites.net/lineliff/';
+const serviceUrl = 'http://localhost:41781/lineliff/';
 const ProductServices = {
   getShowingProducts() {
     return requests.get('/products/show');
@@ -158,9 +158,9 @@ const ProductServices = {
         return "Error: " + err.message
     }
   },
-  //getDefaultDataCompany(body){
-    //return requests.post('/products/GetDefaultDataCompany',body);
-  //},
+  getDefaultDataCompany(body){
+    return requests.post('/products/GetDefaultDataCompany',body);
+  },
   async fetchGetDefaultDataCompany(body){
     try
     {
@@ -527,43 +527,6 @@ const ProductServices = {
     }
     
   },
-  async fetchGetLiffURLTemplate()
-  {
-    try
-    {
-      //res.send("getLiff URL");
-      //return;
-      //var template = "";
-      var url = serviceUrl + 'GetLiffURLTemplate'
-      //res.send("getLiff URL = " + url);
-      //return;
-      var template = null;
-      console.log("getLiff URL")
-      await fetch(url,
-        { 
-          method:'GET',
-          //credentials:"include",
-          headers: {'Content-Type': 'application/json','x-security-lock':'0241CCFF2D40AF7AF8A4FC02272C47A30D15DBDFB36E3266D1296212574F328E'},
-          
-        }).then(function(response) {
-          return response.text();
-        }).then(function(data) {
-
-          console.log(data);
-          var obj = data;
-          template = obj;
-        });
-      
-      
-
-        return template;
-    }
-    catch(err) {
-      return "Error: " + err.message;
-      
-    }
-  }
-};
 
 };
 
