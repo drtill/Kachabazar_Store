@@ -1005,6 +1005,7 @@ console.log(JSON.stringify(countryData));
 
 var liffEndpoint = await  UserServices.getLiffURLTemplate();
 
+console.log(JSON.stringify(liffEndpoint));
 var catalogName = '';
 var companyCode = '';
 
