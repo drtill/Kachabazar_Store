@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useContext,useEffect, useState } from 'react';
 import { useCart} from 'react-use-cart';
 import { useRouter } from 'next/router'
 
 import Cookies from 'js-cookie';
 
-import useSessionstorage from '@rooks/use-sessionstorage';
-
 import UserServices from '@services/UserServices';
-//internal import
+import OrderServices from '@services/OrderServices';
+
+import Link from 'next/link';
+import Image from 'next/image';
+
 import Layout from '@layout/Layout';
 import Banner from '@component/banner/Banner';
 import CardTwo from '@component/cta-card/CardTwo';
@@ -18,10 +20,16 @@ import ProductCard from '@component/product/ProductCard';
 import MainCarousel from '@component/carousel/MainCarousel';
 import FeatureCategory from '@component/category/FeatureCategory';
 
+import useCheckoutSubmit from '@hooks/useCheckoutSubmit';
+import { UserContext } from '@context/UserContext';
+
+import Loading from '@component/preloader/Loading';
+
+import useLoginSubmit from '@hooks/useLoginSubmit';
+//const liffId = process.env.NEXT_PUBLIC_LIFF_ID
 const isLiffLogin = true;//process.env.NEXT_PUBLIC_ISLOGIN
 var itemPerPage = 30;
-
-const Detail = ({params,dataPath,title,description, liffEndpoint,liffData,linePOSIdData,
+const Details = ({params,dataPath,title,description, liffEndpoint,liffData,linePOSIdData,
   groupIdData, liffOrderId, liffCompanyId,liffLocationId,countPage,currentPage,
   products,salesOrder, orderDetails,categories,shippingServices,bankNameAndAccounts,
   currencySign, companyName, locationName,companyLogo,
@@ -33,9 +41,17 @@ const Detail = ({params,dataPath,title,description, liffEndpoint,liffData,linePO
   locationEmail,locationTel,
   companyFacebook,companyLine
   }) => {
-  const [value, set] = useSessionstorage('products', products);
+   
+    const {
+      couponInfo,
+      couponRef,
+      setCouponData,
+      clearCouponData,
+      discountAmount,
+      
+    } = useCheckoutSubmit();
 
-  const router = useRouter();
+    const router = useRouter();
 
     const [liffId, setLiffId] = useState(liffData);
     const [linePOSId, setLinePOSId] = useState(linePOSIdData);
@@ -78,14 +94,18 @@ const Detail = ({params,dataPath,title,description, liffEndpoint,liffData,linePO
     const [promotionCode,setPromotionCode] = useState('');
 
     const { setItems,clearCartMetadata,emptyCart, addItem, items } = useCart();
+    const {dispatch} = useContext(UserContext);
 
+    const { handleSubmit, submitHandler, register, errors } =
+    useLoginSubmit();
+    
     useEffect(async () => {
       //alert("companyName = " + companyNameData)
 
       //var getPromotionCode = localStorage.getItem('promotionCode')
 
       //alert("getPromotionCode = " + getPromotionCode);
-      
+      setPromotionLoading(true);
 
 
       sessionStorage.setItem('dataPath',dataPath);
@@ -138,7 +158,8 @@ const Detail = ({params,dataPath,title,description, liffEndpoint,liffData,linePO
       sessionStorage.setItem('postalcode', postalcode);
 
       //alert(JSON.stringify(countrys))
-      sessionStorage.setItem('countrys', JSON.stringify(countrys));
+      sessionStorage.setItem('countrys', 'JSON.stringify(countrys)');
+      sessionStorage.setItem('countrysJSON', JSON.stringify(countrys));
       sessionStorage.setItem('provinces', JSON.stringify(provinces));
       sessionStorage.setItem('cities', JSON.stringify(cities));
       sessionStorage.setItem('districts', JSON.stringify(districts));
@@ -148,19 +169,19 @@ const Detail = ({params,dataPath,title,description, liffEndpoint,liffData,linePO
       
       if(isLiffLogin === true)
       {
-        if(liffId.length === 0)
+        if(liffData.length === 0)
         {
           //alert("Liff Data is not found.");
           router.push('/404');
         }
         const liff = (await import('@line/liff')).default
         try {
-          await liff.init({ liffId });
+          await liff.init({ liffId:liffData });
         } catch (error) {
           console.error('liff init error', error.message)
         }
         if (!liff.isLoggedIn()) {
-          //alert("Login")
+          //alert("Will Login")
           var url = liffEndpoint + '/liffId=' + liffData + '?linePOSId=' + linePOSId + "&groupId=" + groupId + '&orderId=' + liffOrderId + '&companyId=' + liffCompanyId + '&locationId=' + liffLocationId;
           //var url = liffEndpoint + '/liffId=1656555843-E6WV7arj?linePOSId=U5bcb2afaf17c20551ab5afdcfec5c1d3&groupId=C2930285a261eeeb4b095a3219a32a7b7&orderId=4938&companyId=2&locationId=2&process=product'
           //alert(url);
@@ -168,6 +189,7 @@ const Detail = ({params,dataPath,title,description, liffEndpoint,liffData,linePO
         }
         else
         {
+          //alert("Logined")
           let getProfile = await liff.getProfile();
 
           //alert("GetProfile")
@@ -189,13 +211,37 @@ const Detail = ({params,dataPath,title,description, liffEndpoint,liffData,linePO
           var dataUser = {};
           dataUser['image'] = lineProfileImage;
           dataUser['name'] = lineUsername;
+
           //orderData['_id']
           //Cookies.set('lineUserName', lineUsername);
           Cookies.set('userInfo', JSON.stringify(dataUser));
+          sessionStorage.setItem('userInfo', JSON.stringify(dataUser));
+          localStorage.setItem('userInfo', JSON.stringify(dataUser));
+          dispatch({ type: 'USER_LOGIN', payload: dataUser });
           //Cookies.set('lineUserId', lineUserId);
           //Cookies.set('lineProfileImage', lineProfileImage);
+          var data = {};
+
+          var liffId = liffData;
+          var lineUserId = lineLiffUserId;
+          var linePOSId = linePOSIdData;
+          if(liffId.length > 0 &&  lineUserId.length > 0)
+          {
+            data["liffId"] = liffId;
+            data["lineUserId"] = lineUserId;
+            data["linePOSId"] = linePOSId;
+            var companyId = Number(liffCompanyId);
+            var paramPath = dataPath;
+          
+            data["companyId"] = companyId;
+            data["paramPath"] = paramPath;
+
+          
+          
+
+            submitHandler(data)
   
-  
+          }
         }
       }
       else
@@ -216,7 +262,7 @@ const Detail = ({params,dataPath,title,description, liffEndpoint,liffData,linePO
       try
       {
         //alert("Get Order");
-        const salesOrder = await ProductServices.getCoinPOSOrder({
+        const salesOrder = await ProductServices.fetchGetCoinPOSOrder({
             liffId,
             lineUserId,
             linePOSId,
@@ -229,12 +275,24 @@ const Detail = ({params,dataPath,title,description, liffEndpoint,liffData,linePO
     
           //alert("Get SaleOrder");
           //alert(JSON.stringify(salesOrder));
+          if(salesOrder.orderStatusId !== 1)
+          {
+            alert("Goto Order")
+            router.push('/order/' + salesOrder.orderId);
+
+            return ;
+          }
+          
     
+          sessionStorage.setItem('customerTypeId',salesOrder.customerTypeId);
+
           var salesOrderDetails = salesOrder.orderDetails;
 
+          var promotionCode = salesOrder.promotionCode;
           
           const productDs = [];
           const discountDetails = [];
+
           for(var i = 0;i<salesOrderDetails.length;i++)
           {
             var detail = {
@@ -259,19 +317,28 @@ const Detail = ({params,dataPath,title,description, liffEndpoint,liffData,linePO
           }
           //alert("Set Cart")
           setItems(productDs);
-          sessionStorage.setItem('discountDetails', JSON.stringify(discountDetails));
-          setDiscountDetail(JSON.stringify(discountDetails))
+          if(promotionCode !== undefined && promotionCode !== null)
+          {
+            //alert("Set Promo")
+            sessionStorage.setItem('discountDetails', JSON.stringify(discountDetails));
+            sessionStorage.setItem('promotionCode', promotionCode);
+            SetPromotionData(promotionCode,'',0,discountDetails[0].discountRate, true);
+            setDiscountDetail(JSON.stringify(discountDetails))
+          }
+          
 
           //alert("Get Product")
-          await GetProductData(liffId,lineUserId,linePOSId,groupId,orderId,companyId,locationId,companyName,locationName,'','',0,9,1,itemPerPage,'','','');
+          await GetProductData(liffId,lineUserId,linePOSId,groupId,orderId,companyId,locationId,companyName,locationName,'','',0,salesOrder.customerTypeId,1,itemPerPage,'','','');
           //setProductList([]);
           //alert("Set Product")
           //pagingManager();
           //setProductList(products);
 
+          setPromotionLoading(false);
           setCategoryLoading(false);
           setNewProductLoading(false);
           setLoading(false);
+
       }
       catch (err) 
       {
@@ -281,6 +348,8 @@ const Detail = ({params,dataPath,title,description, liffEndpoint,liffData,linePO
 
       
     }, [])
+
+    
 
     const GetProductData = async(liffId,
       lineUserId,
@@ -296,7 +365,7 @@ const Detail = ({params,dataPath,title,description, liffEndpoint,liffData,linePO
       promotionId,customerTypeId,page,itemPerPage,query,category,product) =>
     {
       //alert('locationId = ' + locationId);
-      const products = await ProductServices.getCoinPOSProductService({
+      const products = await ProductServices.fetchGetCoinPOSProductService({
         liffId,
         lineUserId,
         linePOSId,
@@ -462,7 +531,7 @@ const CancelPromotionCode = async(promotionCode) =>
          
         orderDetails.push(orderDetail);
       }
-      const promotion = await ProductServices.cancelPromotionCode({
+      const promotionJson = await ProductServices.fetchCancelPromotionCode({
         companyId,
         locationId,
         orderId,
@@ -474,6 +543,7 @@ const CancelPromotionCode = async(promotionCode) =>
         catalogName:'',
         orderDetails:JSON.stringify(orderDetails)
       });
+      var promotion = JSON.parse(promotionJson);
       var salesOrderDetails = promotion.orderDetails;
 
           const productDs = [];
@@ -520,7 +590,11 @@ const CancelPromotionCode = async(promotionCode) =>
 
           setDiscountDetail(undefined)
 
+          clearCouponData();
+
           setPromotionLoading(false);
+
+          SetPromotionData(promotionCode,promotion.endTime,promotion.minimumAmount,promotion.discountRate,false);
 }
     const ApplyPromotionCode = async(promotionCode,discountPercentage, isForAllProduct, minimumAmount, productIdList) =>
     {
@@ -545,7 +619,7 @@ const CancelPromotionCode = async(promotionCode) =>
          
         orderDetails.push(orderDetail);
       }
-      const promotion = await ProductServices.applyPromotionCode({
+      const promotionJson = await ProductServices.fetchApplyPromotionCode({
         companyId,
         locationId,
         orderId,
@@ -557,8 +631,11 @@ const CancelPromotionCode = async(promotionCode) =>
         catalogName:'',
         orderDetails:JSON.stringify(orderDetails)
       });
+      var promotion = JSON.parse(promotionJson);
       var salesOrderDetails = promotion.orderDetails;
 
+      //alert("promotion = " + JSON.stringify(promotion));
+      //alert("SalesOrderDetails = " + JSON.stringify(salesOrderDetails));
           const productDs = [];
           const discountDetails = [];
           
@@ -604,20 +681,37 @@ const CancelPromotionCode = async(promotionCode) =>
           setDiscountDetail(JSON.stringify(discountDetails))
           setPromotionLoading(false);
     }
+
+    const SetPromotionData = (promotionCode,promotionEndTime,promotionMinimumAmount,promotionDiscountRate, isAuto) =>
+      {
+        var couponData = [];
+        
+        var couponDetail = {
+          couponCode:promotionCode,
+          endTime:promotionEndTime,
+          minimumAmount:promotionMinimumAmount,
+          discountPercentage:promotionDiscountRate,
+      
+        };
+        couponData.push(couponDetail);
+                
+        sessionStorage.setItem('couponInfo', JSON.stringify(couponData));
+        setCouponData(promotionCode, couponData, isAuto);
+      }
     const SearchProduct = async (searchText) => 
     {
       //alert("Searching = " + searchText);
-      RefreshProductList(liffData,lineUserId,linePOSId,groupId,liffOrderId,liffCompanyId,liffLocationId,'','',0,9,1,30,searchText)
+      RefreshProductList(liffData,lineUserId,linePOSId,groupId,liffOrderId,liffCompanyId,liffLocationId,'','',0,9,1,itemPerPage,searchText)
     }
     const FilterCategory = async (categoty) => 
     {
       //alert("categoty = " + categoty);
-      RefreshProductList(liffData,lineUserId,linePOSId,groupId,liffOrderId,liffCompanyId,liffLocationId,'','',0,9,1,30,'',categoty)
+      RefreshProductList(liffData,lineUserId,linePOSId,groupId,liffOrderId,liffCompanyId,liffLocationId,'','',0,9,1,itemPerPage,'',categoty)
     }
     const FilterProduct = async (category,product) => 
     {
       //alert("product = " + product);
-      RefreshProductList(liffData,lineUserId,linePOSId,groupId,liffOrderId,liffCompanyId,liffLocationId,'','',0,9,1,30,'',category,product)
+      RefreshProductList(liffData,lineUserId,linePOSId,groupId,liffOrderId,liffCompanyId,liffLocationId,'','',0,9,1,itemPerPage,'',category,product)
     }
     const RefreshProductList = async (liffId, lineUserId, linePOSId, groupId, orderId,companyId,locationId,companyName, locationName, promotionId,customerTypeId,page,itemPerPage,query,category,product) =>
     {
@@ -626,7 +720,7 @@ const CancelPromotionCode = async(promotionCode) =>
       query = query === undefined ? 'null' : query;
       category = category === undefined ? 'null' : category;
       product = product === undefined ? 'null' : product;
-      const products = await ProductServices.getCoinPOSProductService({
+      const products = await ProductServices.fetchRefreshCoinPOSProductService({
         liffId,
         lineUserId,
         linePOSId,
@@ -641,7 +735,10 @@ const CancelPromotionCode = async(promotionCode) =>
         promotionId,customerTypeId,page,itemPerPage,query,category,product
       });
 
+      //alert(products);
       currentPage = products.currentPage;
+      countPage = products.countPage;
+      
       var productVariants = [];//products.productVariantPresenters;
       for(var i = 0;i < products.productVariantPresenters.length; i++)
       {
@@ -757,42 +854,107 @@ const CancelPromotionCode = async(promotionCode) =>
     }
     
 
-  return (
-    <>
-      <Layout>
+
+
+
+    return (
+        <>
+      <Layout title={title} description={description} dataPath={dataPath} companyName={companyName} locationName={locationName} companyLogo={companyLogo} 
+      locationAddress1={locationAddress1} locationAddress2={locationAddress2} locationCity={locationCity}
+      locationStateOrProvince={locationStateOrProvince} locationCountry={locationCountry} locationPostalCode={locationPostalCode}
+      locationEmail={locationEmail} locationTel={locationTel}
+      RefreshProductList={SearchProduct} FilterProduct={FilterProduct} >
         <div className="min-h-screen">
-          <StickyCart />
+          <StickyCart discountDetails={discountDataDetails} currencySign={currencySign}/>
           <div className="bg-white">
             <div className="mx-auto py-5 max-w-screen-2xl px-3 sm:px-10">
-              <div className="flex w-full">
-                <div className="flex-shrink-0 xl:pr-6 lg:block w-full lg:w-3/5">
-                  <MainCarousel />
-                </div>
-                <div className="w-full hidden lg:flex">
-                  <OfferCard />
-                </div>
-              </div>
-              <div className="bg-orange-100 px-10 py-6 rounded-lg mt-6 hidden lg:block">
-                <Banner />
-              </div>
+
+              {promotionLoading ?
+                      <div className="bg-gray-100 lg:py-16 py-10">
+                        <div className="mx-auto max-w-screen-2xl px-3 sm:px-10">
+                          
+                          <div className="mb-10 flex justify-center">
+                            <div className="text-center w-full lg:w-2/5">
+                              <Loading loading={promotionLoading} />
+                              <p className="text-base font-sans text-gray-600 leading-6">
+                                กำลังปรับปรุงส่วนลด กรุณารอสักครู่
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      :
+                        <div className="flex w-full">
+                          <div className="w-full lg:flex">
+                            <OfferCard promotions={promotions} selectedPromotion={promotionCode} companyId={liffCompanyId} ApplyPromotionCode={ApplyPromotionCode} CancelPromotionCode={CancelPromotionCode}/>
+                        
+                        </div>
+                        </div>
+                      
+                      
+                    }   
+                    
+              
+              
             </div>
           </div>
 
+
+
+          <div id="newProduct"
+            className="bg-gray-50 lg:py-16 py-10 mx-auto max-w-screen-2xl px-3 sm:px-10"
+          >
+            <div className="mb-10 flex justify-center">
+              <div className="text-center w-full lg:w-2/5">
+                <h2 className="text-xl lg:text-2xl mb-2 font-serif font-semibold">
+                  Latest New Products
+                </h2>
+                
+              </div>
+            </div>
+            {
+                newProductLoading ? (
+                  <Loading loading={newProductLoading} />
+                )
+                :
+                (
+                  <div className="flex">
+                    <div className="w-full">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3 lg:gap-3">
+                        {newProductList.map((product) => (
+                          <ProductCard key={product._id} product={product} liffId={liffData} lineUserId={lineUserId} 
+                          linePOSId={linePOSId} groupId={groupId} orderId={liffOrderId} companyId={liffCompanyId} locationId={liffLocationId} pictureUrl={lineProfileImage} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )
+              }
+            
+          </div>
           {/* feature category's */}
           <div className="bg-gray-100 lg:py-16 py-10">
             <div className="mx-auto max-w-screen-2xl px-3 sm:px-10">
               <div className="mb-10 flex justify-center">
                 <div className="text-center w-full lg:w-2/5">
                   <h2 className="text-xl lg:text-2xl mb-2 font-serif font-semibold">
-                    Featured Categories 123456
+                    Featured Categories
                   </h2>
-                  {params}
                   <p className="text-base font-sans text-gray-600 leading-6">
-                    Choose your necessary products from this feature categories.
+                    เลือกหมวดหมู่สินค้า เพื่อค้นหาสินค้าที่ตรงใจคุณอย่างรวดเร็ว
                   </p>
                 </div>
               </div>
-              <FeatureCategory />
+              {
+                categoryLoading ? (
+                  <Loading loading={categoryLoading} />
+                )
+                :
+                (
+                  <FeatureCategory categories={categoryList} FilterCategory={FilterCategory} FilterProduct={FilterProduct}/>
+                )
+              }
             </div>
           </div>
 
@@ -801,44 +963,73 @@ const CancelPromotionCode = async(promotionCode) =>
             <div className="mb-10 flex justify-center">
               <div className="text-center w-full lg:w-2/5">
                 <h2 className="text-xl lg:text-2xl mb-2 font-serif font-semibold">
-                  Popular Products for Daily Shopping
+                  สินค้าทั้งหมด สำหรับการช็อปปิ้งของคุณ
                 </h2>
-                <p className="text-base font-sans text-gray-600 leading-6">
-                  See all our popular products in this week. You can choose your
-                  daily needs products from this list and get some special offer
-                  with free shipping.
-                </p>
+                
               </div>
             </div>
-            <div className="flex">
-              <div className="w-full">
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3 lg:gap-3">
-                  {/* {popularProducts?.slice(0, 18).map((product) => (
-                    <ProductCard key={product._id} product={product} />
-                  ))} */}
-                </div>
-              </div>
-            </div>
+            {
+              loading ? (
+                <Loading loading={loading} />
+              )
+              :
+              (
+                <>
+                  <div className="flex">
+                    <div className="w-full">
+                      
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3 lg:gap-3">
+                        {productList?.map((product) => (
+                          <ProductCard key={product._id} product={product} liffId={liffData} lineUserId={lineUserId} 
+                          linePOSId={linePOSId} groupId={groupId} orderId={liffOrderId} companyId={liffCompanyId} locationId={liffLocationId} pictureUrl={lineProfileImage}  />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex">
+                    <div className="w-full">
+                    <div id="pagingProduct" className=" lg:py-16 bg-repeat bg-center overflow-hidden">
+                      <div className="max-w-screen-2xl mx-auto px-4 sm:px-10">
+                        <div className="grid grid-cols-1 gap-2 md:gap-3 lg:gap-3 items-center">
+                          
+                          <div className="text-center">
+                            
+                            <div className="mt-2">
+                              {pagingIndent}
+                            </div>
+                          </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                      
+                    </div>
+                  </div>
+                </>
+                
+              )    
+            }
+            
           </div>
 
           {/* promotional banner card */}
-          <div className="block mx-auto max-w-screen-2xl">
+          {/* <div className="block mx-auto max-w-screen-2xl">
             <div className="mx-auto max-w-screen-2xl px-4 sm:px-10">
               <div className="lg:p-16 p-6 bg-emerald-500 shadow-sm border rounded-lg">
                 <CardTwo />
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* discounted products */}
-          <div
+          {/* <div
             id="discount"
             className="bg-gray-50 lg:py-16 py-10 mx-auto max-w-screen-2xl px-3 sm:px-10"
           >
             <div className="mb-10 flex justify-center">
               <div className="text-center w-full lg:w-2/5">
                 <h2 className="text-xl lg:text-2xl mb-2 font-serif font-semibold">
-                  Latest Discounted Products 111
+                  Latest Discounted Products
                 </h2>
                 <p className="text-base font-sans text-gray-600 leading-6">
                   See Our latest discounted products below. Choose your daily
@@ -849,167 +1040,177 @@ const CancelPromotionCode = async(promotionCode) =>
             <div className="flex">
               <div className="w-full">
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3 lg:gap-3">
-                  {/* {discountProducts?.slice(0, 18).map((product) => (
+                  {discountProducts?.slice(0, 18).map((product) => (
                     <ProductCard key={product._id} product={product} />
-                  ))} */}
+                  ))}
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </Layout>
     </>
-  );
-};
-
-export const getServerSideProps = async ({req, res,params }) => {
-  //var coinPOSLiffData = params.id;
-  //alert("Param = " + params.id);
-  var dataParam = params.id;
-  var coinPOSLiffData = req.url.replace('/','');
-
-  var liffCompanyId = 0;
-  var liffLocationId = 0;
-  var liffProcess = "";
-  var liffCompanyName = "";
-
-  var liffData = '';
-  var linePOSId = '';
-  var lineUserId = '';
-  var groupId = '';
-  var liffOrderId = null;
-
-  var companyName = '';
-  var locationName = '';
-  const promotionId = 0;
-
-  const customerTypeId = 9;
-  var page = 1;
-  var itemPerPage = 30;
-  const query = null;
-  const category = null;
-  const product = null;   
-
-  const title = "all-in-one, heavy-duty & modern ecommerce platform";
-  const description = "CoinPOS Ecommerce Platform - All-in-one, heavy-duty, cost-effective and modern ecommerce platform for business of all sizes.";
-
-  
-  if(coinPOSLiffData.length > 0)
-{
-  const parms = coinPOSLiffData.split('?');
-
-  
-
-  if(parms.length > 1)
-  {
-    const liffQuery = parms[0];
-    const liffOrderQuery = parms[1];
-    var liffVar = liffQuery.split("=");
-    if(liffVar[0] === 'liffId')
-    {
-      liffData = liffVar[1];
-      
-    }
-
-    var vars = liffOrderQuery.split("&");
-    for (var i=0;i<vars.length;i++)
-    {
-      var pair = vars[i].split("=");
-      if(pair[0] === 'liffId')
-      {
-        liffData = pair[1];
-        
-      }
-      if(pair[0] === 'linePOSId')
-      {
-        linePOSId = pair[1];
-      }
-      if(pair[0] === 'groupId')
-      {
-        groupId = pair[1];
-      }
-      if(pair[0] === 'orderId')
-      {
-        liffOrderId = Number(pair[1]);
-      }
-      if(pair[0] === 'companyId')
-      {
-          liffCompanyId = Number(pair[1]);
-      }
-      if(pair[0] === 'companyName')
-      {
-          liffCompanyName = pair[1];
-      }
-      if(pair[0] === 'locationId')
-      {
-          liffLocationId = Number(pair[1]);
-      }
-      if(pair[0] === 'process')
-      {
-          liffProcess = pair[1];
-      }
-
-      if(pair[0] === 'liff.state')
-      {
-        var param = pair[1];
-        param = param.replaceAll("%3D","=");
-        param = param.replaceAll("%26","&");
-        param = param.replaceAll("%3F","?");
-        param = param.replace("?","");
-        var m_params = param.split("&");
-        for (var j=0;j<m_params.length;j++)
-        {
-          var paramValue = m_params[j].split("=");
-          if(paramValue[0] === 'linePOSId')
-          {
-            linePOSId = paramValue[1];
-          }
-          if(paramValue[0] === 'groupId')
-          {
-            groupId = paramValue[1];
-          }
-          if(paramValue[0] === 'orderId')
-          {
-            liffOrderId = Number(paramValue[1]);
-          }
-          if(paramValue[0] === 'companyId')
-          {
-            liffCompanyId = Number(paramValue[1]);
-          }
-          if(paramValue[0] === 'locationId')
-          {
-            liffLocationId = Number(paramValue[1]);
-          }
-          if(paramValue[0] === 'process')
-          {
-            liffProcess = paramValue[1];
-          }
-        }
-
-      }
-    }
-  }
-
+    );
 }
 
-var liffId = liffData;
-var orderId = liffOrderId;
-var companyId = liffCompanyId;
-var locationId = liffLocationId;
 
-var dataPath = 'liffId=' + liffId + '?linePOSId=' + linePOSId + '&groupId=' + groupId + '&orderId=' + liffOrderId + '&companyId=' + liffCompanyId + '&locationId=' + liffLocationId;
+export const getServerSideProps = async ({req, res,params }) => {
+    //var coinPOSLiffData = params.id;
+    //alert("Param = " + params.id);
+    var dataParam = params.id;
+    var coinPOSLiffData = req.url.replace('/','');
 
-var countryData = await ProductServices.getCountry();
+    var liffCompanyId = 0;
+    var liffLocationId = 0;
+    var liffProcess = "";
+    var liffCompanyName = "";
 
-console.log(JSON.stringify(countryData));
+    var liffData = '';
+    var linePOSId = '';
+    var lineUserId = '';
+    var groupId = '';
+    var liffOrderId = null;
 
-var liffEndpoint = await  UserServices.getLiffURLTemplate();
+    var companyName = '';
+    var locationName = '';
+    const promotionId = 0;
 
-var catalogName = '';
-var companyCode = '';
+    const customerTypeId = 9;
+    var page = 1;
+    var itemPerPage = 30;
+    const query = '';
+    const category = '';
+    const product = '';   
 
-const products = await ProductServices.getDefaultDataCompany({
-  //const products = await ProductServices.getCoinPOSProductService({
+    const title = "all-in-one, heavy-duty & modern ecommerce platform";
+    const description = "CoinPOS Ecommerce Platform - All-in-one, heavy-duty, cost-effective and modern ecommerce platform for business of all sizes.";
+
+    
+    if(coinPOSLiffData.length > 0)
+  {
+    const parms = coinPOSLiffData.split('?');
+
+    
+
+    if(parms.length > 1)
+    {
+      const liffQuery = parms[0];
+      const liffOrderQuery = parms[1];
+      var liffVar = liffQuery.split("=");
+      if(liffVar[0] === 'liffId')
+      {
+        liffData = liffVar[1];
+        
+      }
+
+      var vars = liffOrderQuery.split("&");
+      for (var i=0;i<vars.length;i++)
+      {
+        var pair = vars[i].split("=");
+        if(pair[0] === 'liffId')
+        {
+          liffData = pair[1];
+          
+        }
+        if(pair[0] === 'linePOSId')
+        {
+          linePOSId = pair[1];
+        }
+        if(pair[0] === 'groupId')
+        {
+          groupId = pair[1];
+        }
+        if(pair[0] === 'orderId')
+        {
+          liffOrderId = Number(pair[1]);
+        }
+        if(pair[0] === 'companyId')
+        {
+            liffCompanyId = Number(pair[1]);
+        }
+        if(pair[0] === 'companyName')
+        {
+            liffCompanyName = pair[1];
+        }
+        if(pair[0] === 'locationId')
+        {
+            liffLocationId = Number(pair[1]);
+        }
+        if(pair[0] === 'process')
+        {
+            liffProcess = pair[1];
+        }
+
+        if(pair[0] === 'liff.state')
+        {
+          var param = pair[1];
+          param = param.replaceAll("%3D","=");
+          param = param.replaceAll("%26","&");
+          param = param.replaceAll("%3F","?");
+          param = param.replace("?","");
+          var m_params = param.split("&");
+          for (var j=0;j<m_params.length;j++)
+          {
+            var paramValue = m_params[j].split("=");
+            if(paramValue[0] === 'linePOSId')
+            {
+              linePOSId = paramValue[1];
+            }
+            if(paramValue[0] === 'groupId')
+            {
+              groupId = paramValue[1];
+            }
+            if(paramValue[0] === 'orderId')
+            {
+              liffOrderId = Number(paramValue[1]);
+            }
+            if(paramValue[0] === 'companyId')
+            {
+              liffCompanyId = Number(paramValue[1]);
+            }
+            if(paramValue[0] === 'locationId')
+            {
+              liffLocationId = Number(paramValue[1]);
+            }
+            if(paramValue[0] === 'process')
+            {
+              liffProcess = paramValue[1];
+            }
+          }
+
+        }
+      }
+    }
+
+  }
+
+  var liffId = liffData;
+  var orderId = liffOrderId;
+  var companyId = liffCompanyId;
+  var locationId = liffLocationId;
+  
+  var dataPath = 'liffId=' + liffId + '?linePOSId=' + linePOSId + '&groupId=' + groupId + '&orderId=' + liffOrderId + '&companyId=' + liffCompanyId + '&locationId=' + liffLocationId;
+  
+  var liffEndpoint = await  UserServices.fetchGetLiffURLTemplate();
+
+  var catalogName = '';
+  var companyCode = '';
+
+  const products = await ProductServices.fetchGetDefaultDataCompany({
+    //const products = await ProductServices.getCoinPOSProductService({
+      liffId,
+      lineUserId,
+      linePOSId,
+      groupId,
+      orderId:orderId === null ? 0 : orderId,
+      companyId,locationId,
+      companyName,
+      locationName,
+      catalogName,
+      companyCode,
+      promotionId,customerTypeId,page,itemPerPage,query,category,product
+    });
+  /*const products = await ProductServices.getCoinPOSProductService({
     liffId,
     lineUserId,
     linePOSId,
@@ -1018,29 +1219,70 @@ const products = await ProductServices.getDefaultDataCompany({
     companyId,locationId,
     companyName,
     locationName,
-    catalogName,
-    companyCode,
+    catalogName:'',
     promotionId,customerTypeId,page,itemPerPage,query,category,product
-  });
-/*const products = await ProductServices.getCoinPOSProductService({
-  liffId,
-  lineUserId,
-  linePOSId,
-  groupId,
-  orderId,
-  companyId,locationId,
-  companyName,
-  locationName,
-  catalogName:'',
-  promotionId,customerTypeId,page,itemPerPage,query,category,product
-});*/
+  });*/
 
-/*var productVariants = [];//products.productVariantPresenters;
-var productCategories = [];
+  /*var productVariants = [];//products.productVariantPresenters;
+  var productCategories = [];
 
-if(products.productVariantPresenters !== null)
-{
-  for(var i = 0;i < products.productVariantPresenters.length; i++)
+  if(products.productVariantPresenters !== null)
+  {
+    for(var i = 0;i < products.productVariantPresenters.length; i++)
+    {
+      var productItem = {};
+      productItem['_id'] = Number(products.productVariantPresenters[i].ProductVariantId);
+      productItem['title'] = products.productVariantPresenters[i].Name;
+      productItem['quantity'] = products.productVariantPresenters[i].StockLevel;
+      productItem['image'] = products.productVariantPresenters[i].ImageUrl;
+      productItem['unit'] = products.productVariantPresenters[i].UPC;
+      productItem['slug'] = products.productVariantPresenters[i].UPC;
+      productItem['originalPrice'] = products.productVariantPresenters[i].Price;
+      productItem['price'] = products.productVariantPresenters[i].Price;
+      productItem['type'] = '';
+      productItem['sku'] = products.productVariantPresenters[i].SKU;
+      productItem['discount'] = 0;
+      productItem['description'] = products.productVariantPresenters[i].Description;
+      productItem['currencySign'] = products.currencySign;
+      
+
+
+      productVariants.push(productItem);
+    }
+  }*/
+  
+
+  /*if(products.productCategoryPresenters !== null)
+  {
+    for(var j = 0;j < products.productCategoryPresenters.length; j++)
+    {
+
+      
+      var nests = [];
+      for(var k = 0;k < products.productCategoryPresenters[j].Products.length; k++)
+      {
+        var children = {};
+        children['_id'] = Number(products.productCategoryPresenters[j].Products[k].ProductId);
+        children['title'] = products.productCategoryPresenters[j].Products[k].Name;
+        nests.push(children);
+      }
+      
+
+      
+      var productCategory = {};
+      productCategory['_id'] = Number(products.productCategoryPresenters[j].CategoryId);
+      productCategory['parent'] = products.productCategoryPresenters[j].Name;
+      productCategory['icon'] = products.productCategoryPresenters[j].ImageUrl;
+      productCategory['children'] = nests;
+
+      productCategories.push(productCategory);
+
+
+    }
+  }*/
+  
+
+  /* for(var i = 0;i < products.productCategoryPresenters.length; i++)
   {
     var productItem = {};
     productItem['_id'] = Number(products.productVariantPresenters[i].ProductVariantId);
@@ -1060,196 +1302,133 @@ if(products.productVariantPresenters !== null)
 
 
     productVariants.push(productItem);
-  }
-}*/
-
-
-/*if(products.productCategoryPresenters !== null)
-{
-  for(var j = 0;j < products.productCategoryPresenters.length; j++)
-  {
-
-    
-    var nests = [];
-    for(var k = 0;k < products.productCategoryPresenters[j].Products.length; k++)
-    {
-      var children = {};
-      children['_id'] = Number(products.productCategoryPresenters[j].Products[k].ProductId);
-      children['title'] = products.productCategoryPresenters[j].Products[k].Name;
-      nests.push(children);
-    }
-    
-
-    
-    var productCategory = {};
-    productCategory['_id'] = Number(products.productCategoryPresenters[j].CategoryId);
-    productCategory['parent'] = products.productCategoryPresenters[j].Name;
-    productCategory['icon'] = products.productCategoryPresenters[j].ImageUrl;
-    productCategory['children'] = nests;
-
-    productCategories.push(productCategory);
-
-
-  }
-}*/
-
-
-/* for(var i = 0;i < products.productCategoryPresenters.length; i++)
-{
-  var productItem = {};
-  productItem['_id'] = Number(products.productVariantPresenters[i].ProductVariantId);
-  productItem['title'] = products.productVariantPresenters[i].Name;
-  productItem['quantity'] = products.productVariantPresenters[i].StockLevel;
-  productItem['image'] = products.productVariantPresenters[i].ImageUrl;
-  productItem['unit'] = products.productVariantPresenters[i].UPC;
-  productItem['slug'] = products.productVariantPresenters[i].UPC;
-  productItem['originalPrice'] = products.productVariantPresenters[i].Price;
-  productItem['price'] = products.productVariantPresenters[i].Price;
-  productItem['type'] = '';
-  productItem['sku'] = products.productVariantPresenters[i].SKU;
-  productItem['discount'] = 0;
-  productItem['description'] = products.productVariantPresenters[i].Description;
-  productItem['currencySign'] = products.currencySign;
+  } */
   
-
-
-  productVariants.push(productItem);
-} */
-
-/*var orderData = {};
-var orderDetailDatas = [];
- if(products.orderDetails !== null)
-{
-  for(var i = 0;i < products.orderDetails.length; i++)
+  /*var orderData = {};
+  var orderDetailDatas = [];
+   if(products.orderDetails !== null)
   {
-    var orderDetailItem = {};
-    orderDetailItem['_id'] = products.orderDetails[i].orderDetailId;
-    orderDetailItem['upc'] = products.orderDetails[i].upc;
-    orderDetailItem['orderId'] = products.orderDetails[i].orderId;
-    orderDetailItem['productVariantId'] = products.orderDetails[i].productVariantId;
-    orderDetailItem['productVariantName'] = products.orderDetails[i].productVariantName;
-    orderDetailItem['sku'] = products.orderDetails[i].sku;
-    orderDetailItem['productVariantPrice'] = products.orderDetails[i].productVariantPrice;
-    orderDetailItem['locationId'] = products.orderDetails[i].locationId;
-    orderDetailItem['discount'] = products.orderDetails[i].discount;
-    orderDetailItem['quantity'] = products.orderDetails[i].quantity;
-    orderDetailItem['imageUrl'] = products.orderDetails[i].imageUrl;
-    orderDetailItem['lineOrder'] = products.orderDetails[i].lineOrder;
+    for(var i = 0;i < products.orderDetails.length; i++)
+    {
+      var orderDetailItem = {};
+      orderDetailItem['_id'] = products.orderDetails[i].orderDetailId;
+      orderDetailItem['upc'] = products.orderDetails[i].upc;
+      orderDetailItem['orderId'] = products.orderDetails[i].orderId;
+      orderDetailItem['productVariantId'] = products.orderDetails[i].productVariantId;
+      orderDetailItem['productVariantName'] = products.orderDetails[i].productVariantName;
+      orderDetailItem['sku'] = products.orderDetails[i].sku;
+      orderDetailItem['productVariantPrice'] = products.orderDetails[i].productVariantPrice;
+      orderDetailItem['locationId'] = products.orderDetails[i].locationId;
+      orderDetailItem['discount'] = products.orderDetails[i].discount;
+      orderDetailItem['quantity'] = products.orderDetails[i].quantity;
+      orderDetailItem['imageUrl'] = products.orderDetails[i].imageUrl;
+      orderDetailItem['lineOrder'] = products.orderDetails[i].lineOrder;
 
-    orderDetailDatas.push(orderDetailItem);
+      orderDetailDatas.push(orderDetailItem);
 
-  }
-}*/
+    }
+  }*/
 
-var promotions = [];
-promotions = products.promotions;
-var shippingServices = products.shippingServices;
-var bankNameAndAccounts = products.bankNameAndAccounts;
-var countPage = products.countPage;
-var currentPage = products.currentPage;
-var currencySign = products.currencySign;
-var customerFirstName = products.firstName;
-var customerLastName = products.lastName;
-var customerEmail = products.email;
-var customerPhoneNumber = products.mobile;
+  var promotions = [];
+  promotions = products.promotions;
+  var shippingServices = products.shippingServices;
+  var bankNameAndAccounts = products.bankNameAndAccounts;
+  var countPage = products.countPage;
+  var currentPage = products.currentPage;
+  var currencySign = products.currencySign;
+  var customerFirstName = products.firstName;
+  var customerLastName = products.lastName;
+  var customerEmail = products.email;
+  var customerPhoneNumber = products.mobile;
 
-var address1 = products.address1;
-var countryId = products.countryId;
-var provinceId = products.provinceId;
-var cityId = products.cityId;
-var districtId = products.districtId;
-var postalcode = products.postalcode;
-var countrys = products.countrys;
-var provinces = products.provinces;
-var cities = products.cities;
-var districts = products.districts;
+  var address1 = products.address1;
+  var countryId = products.countryId;
+  var provinceId = products.provinceId;
+  var cityId = products.cityId;
+  var districtId = products.districtId;
+  var postalcode = products.postalcode;
+  var countrys = products.countrys;
+  var provinces = products.provinces;
+  var cities = products.cities;
+  var districts = products.districts;
 
-var companyLogo = products.companyLogoUrl;
+  var companyLogo = products.companyLogoUrl;
 
-var locationAddress1 = products.locationAddress1;
-var locationAddress2 = products.locationAddress2;
-var locationCity = products.locationCity;
-var locationStateOrProvince = products.locationStateOrProvince;
-var locationCountry = products.locationCountry;
-var locationPostalCode = products.locationPostalCode;
-var locationEmail = products.locationEmail;
-var locationTel = products.locationTel;
+  var locationAddress1 = products.locationAddress1;
+  var locationAddress2 = products.locationAddress2;
+  var locationCity = products.locationCity;
+  var locationStateOrProvince = products.locationStateOrProvince;
+  var locationCountry = products.locationCountry;
+  var locationPostalCode = products.locationPostalCode;
+  var locationEmail = products.locationEmail;
+  var locationTel = products.locationTel;
 
-var companyFacebook = products.companyFacebook;
-var companyLine = products.companyLine;
-
-
-companyName = products.companyName;
-locationName = products.locationName;
+  var companyFacebook = products.companyFacebook;
+  var companyLine = products.companyLine;
 
 
-  return {
-    props: { 
-      params: dataParam,
-      dataPath:dataPath,
-      title:title,
-      description:description,
-      liffEndpoint:liffEndpoint,
-      liffData:liffData,
-      linePOSIdData:linePOSId,
-      groupIdData:groupId,
-      liffOrderId:liffOrderId,
-      liffCompanyId:liffCompanyId,
-      liffLocationId:liffLocationId,
-      countPage:countPage,
-      currentPage:currentPage,
-      //products: productVariants,
-      //salesOrder:orderData,
-      //orderDetails:orderDetailDatas,
-      shippingServices:shippingServices,
-      bankNameAndAccounts:bankNameAndAccounts,
-      currencySign:currencySign,
-      companyName:companyName,
-      companyLogo:companyLogo,
-      companyFacebook:companyFacebook,
-      companyLine:companyLine,
+  companyName = products.companyName;
+  locationName = products.locationName;
 
-      locationName:locationName,
-      //categories:productCategories,
-      customerFirstName:customerFirstName,
-      customerLastName:customerLastName,
-      customerEmail:customerEmail,
-      customerPhoneNumber:customerPhoneNumber,
 
-      address1:address1,
-      countryId:countryId,
-      provinceId:provinceId,
-      cityId:cityId,
-      districtId:districtId,
-      postalcode:postalcode,
-      countrys:countrys,
-      provinces:provinces,
-      cities:cities,
-      districts:districts,
+    return {
+      props: { 
+        params: dataParam,
+        dataPath:dataPath,
+        title:title,
+        description:description,
+        liffEndpoint:liffEndpoint,
+        liffData:liffData,
+        linePOSIdData:linePOSId,
+        groupIdData:groupId,
+        liffOrderId:liffOrderId,
+        liffCompanyId:liffCompanyId,
+        liffLocationId:liffLocationId,
+        countPage:countPage,
+        currentPage:currentPage,
+        //products: productVariants,
+        //salesOrder:orderData,
+        //orderDetails:orderDetailDatas,
+        shippingServices:shippingServices,
+        bankNameAndAccounts:bankNameAndAccounts,
+        currencySign:currencySign,
+        companyName:companyName,
+        companyLogo:companyLogo,
+        companyFacebook:companyFacebook,
+        companyLine:companyLine,
 
-      promotions:promotions,
+        locationName:locationName,
+        //categories:productCategories,
+        customerFirstName:customerFirstName,
+        customerLastName:customerLastName,
+        customerEmail:customerEmail,
+        customerPhoneNumber:customerPhoneNumber,
 
-      locationAddress1:locationAddress1,
-      locationAddress2:locationAddress2,
-      locationCity:locationCity,
-      locationStateOrProvince:locationStateOrProvince,
-      locationCountry:locationCountry,
-      locationPostalCode:locationPostalCode,
-      locationEmail:locationEmail,
-      locationTel:locationTel
+        address1:address1,
+        countryId:countryId,
+        provinceId:provinceId,
+        cityId:cityId,
+        districtId:districtId,
+        postalcode:postalcode,
+        countrys:countrys,
+        provinces:provinces,
+        cities:cities,
+        districts:districts,
 
-    },
+        promotions:promotions,
+
+        locationAddress1:locationAddress1,
+        locationAddress2:locationAddress2,
+        locationCity:locationCity,
+        locationStateOrProvince:locationStateOrProvince,
+        locationCountry:locationCountry,
+        locationPostalCode:locationPostalCode,
+        locationEmail:locationEmail,
+        locationTel:locationTel
+
+      },
+    };
   };
-};
+    
 
-// export const getServerSideProps = async () => {
-//   const products = await ProductServices.getShowingProducts();
-
-//   return {
-//     props: {
-//       products,
-//     },
-//   };
-// };
-
-export default Detail;
+export default Details;
