@@ -86,4 +86,4 @@ Folder Structure & Customization:
 
 Configuration & Deployment:
 
-We use Vercel for Development if you use Vercel for development then just follow the Vercel Documentation, You can also deploy this any other hosting services if you want."# Kachabazar_Store" 
+We use Vercel for Development if you use Vercel for development then just follow the Vercel Documentation, You can also deploy this any other hosting services if you want.
