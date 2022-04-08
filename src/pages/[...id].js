@@ -1196,7 +1196,7 @@ export const getServerSideProps = async ({req, res,params }) => {
   var catalogName = '';
   var companyCode = '';
 
-  const products = await ProductServices.getDefaultDataCompany({
+  const products = await ProductServices.fetchGetDefaultDataCompany({
     //const products = await ProductServices.getCoinPOSProductService({
       liffId,
       lineUserId,

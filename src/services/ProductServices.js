@@ -158,9 +158,9 @@ const ProductServices = {
         return "Error: " + err.message
     }
   },
-  getDefaultDataCompany(body){
-    return requests.post('/products/GetDefaultDataCompany',body);
-  },
+  //getDefaultDataCompany(body){
+    //return requests.post('/products/GetDefaultDataCompany',body);
+  //},
   async fetchGetDefaultDataCompany(body){
     try
     {
